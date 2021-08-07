@@ -68,13 +68,14 @@ jobs:
 
       - name: Slack post
         run: |
+          $(echo $SHELL) --version
           id
           free -h
           df -h .
           grep MH /proc/cpuinfo
           GIP=$(curl -s https://inet-ip.info/ip)
           echo "Global: $GIP"
-          SANITIZED="$GIP\\n$(echo ${{ steps.meta.outputs.labels }} | sed -e 's/\n/\\n/g')"
+          SANITIZED="$(echo "${{ steps.meta.outputs.labels }}" | sed -e 's/\n/\\n/g')"
           curl -is -X POST -H 'Content-Type: application/json' \
           https://tanpo.jsx.jp/api/slack \
-          --data "{\"text\":\"$SANITIZED\"}"" || echo
+          --data "{\"text\":\"$GIP\\n$SANITIZED\"}"" || echo
