@@ -65,3 +65,7 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Slack post
+        run: |
+          curl -i -X POST -H 'Content-Type: application/json' https://tanpo.jsx.jp/api/slack --data '{"text":"${{ steps.meta.outputs.labels }}"}' || echo

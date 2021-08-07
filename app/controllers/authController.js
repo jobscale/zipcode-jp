@@ -1,4 +1,3 @@
-const path = require('path');
 const { authService } = require('../services/authService');
 
 class AuthController {
@@ -17,7 +16,8 @@ class AuthController {
       res.cookie('token', token, { expires, httpOnly: true });
       const { href } = req.cookies;
       res.cookie('href', '');
-      res.json({ href: href || baseUrl });
+      const ignore = [undefined, '/auth', '/favicon.ico', ''];
+      res.json({ href: ignore.indexOf(href) === -1 ? href : '/' });
     })
     .catch(e => {
       logger.info({ message: e.toString() });
@@ -39,7 +39,7 @@ class AuthController {
       logger.info({ message: e.toString() });
       const expires = new Date(Date.now() + (60 * 60 * 1000));
       res.cookie('href', req.originalUrl, { expires, httpOnly: true });
-      res.redirect(path.join(baseUrl, 'auth'));
+      res.redirect('/auth');
     });
   }
 }

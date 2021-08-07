@@ -7,14 +7,16 @@ class Menu {
 
   logout(event) {
     if (event) event.preventDefault();
-    fetch('/v1/auth/logout', {
+    fetch('/auth/logout', {
       method: 'post',
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
         credentials: 'omit',
       },
     })
-    .then(() => document.location.href = '/v1');
+    .then(() => {
+      document.location.href = '';
+    });
   }
 
   trigger() {

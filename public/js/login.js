@@ -6,7 +6,7 @@ class Login {
     const password = document.querySelector('#password').value;
     const status = document.querySelector('#status');
     status.textContent = '';
-    const params = ['/v1/auth/login', {
+    const params = ['/auth/login', {
       method: 'post',
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
@@ -19,11 +19,15 @@ class Login {
       status.textContent = `${res.status} ${res.statusText}`;
       if (res.status !== 200) {
         res.json()
-        .then(json => status.textContent += ` (${json.message})`);
+        .then(json => {
+          status.textContent += ` (${json.message})`;
+        });
         return;
       }
       res.json()
-      .then(json => document.location.href = json.href);
+      .then(json => {
+        document.location.href = json.href;
+      });
     });
   }
 

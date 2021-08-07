@@ -24,7 +24,7 @@ cd node-express-ejs-authorization
 npm i
 npm start
 
-open http://127.0.0.1:3000/v1
+open http://127.0.0.1:3000
 ```
 
 login<br>
@@ -44,7 +44,25 @@ docker run --name p3000 --rm -p 3000:3000 -it jobscale/node-express-ejs-authoriz
 ```
 - open
 ```
-open http://127.0.0.1:3000/v1
+open http://127.0.0.1:3000
+```
+
+- curl
+```
+curl -i -X POST -H 'Content-Type: application/json' \
+http://127.0.0.1:3000/api/slack \
+--data '{"text":"with terminal"}'
+```
+
+- fetch
+```
+fetch("http://127.0.0.1:3000/api/slack", {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json; charset=utf-8',
+  },
+  "body": JSON.stringify({ text: 'with browser' }),
+});
 ```
 
 login<br>

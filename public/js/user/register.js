@@ -1,7 +1,8 @@
 /* eslint-env browser */
-class Password {
-  password(event) {
+class Register {
+  register(event) {
     event.preventDefault();
+    const login = document.querySelector('#login').value;
     const password = document.querySelector('#password').value;
     const confirm = document.querySelector('#confirm').value;
     const status = document.querySelector('#status');
@@ -10,30 +11,33 @@ class Password {
       return;
     }
     status.textContent = '';
-    const params = ['/v1/account/password', {
+    const params = ['/user/register', {
       method: 'post',
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
         credentials: 'omit',
       },
-      body: JSON.stringify({ password }),
+      body: JSON.stringify({ login, password }),
     }];
     fetch(...params)
     .then(res => {
       status.textContent = `${res.status} ${res.statusText}`;
       if (res.status !== 200) {
         res.json()
-        .then(json => status.textContent += ` (${json.message})`);
+        .then(json => {
+          status.textContent += ` (${json.message})`;
+        });
         return;
       }
-      setTimeout(() => document.logout(), 2000);
+      status.textContent += ' User Added';
+      document.form.reset();
     });
   }
 
   trigger() {
     document.querySelector('form')
-    .addEventListener('submit', event => this.password(event));
+    .addEventListener('submit', event => this.register(event));
   }
 }
 
-window.addEventListener('DOMContentLoaded', () => new Password().trigger());
+window.addEventListener('DOMContentLoaded', () => new Register().trigger());

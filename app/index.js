@@ -2,7 +2,7 @@ const path = require('path');
 const createError = require('http-errors');
 const express = require('express');
 const cookieParser = require('cookie-parser');
-require('./global');
+require('@jobscale/core');
 const { topRoute } = require('./routes/topRoute');
 
 class App {
@@ -10,12 +10,7 @@ class App {
     this.app = express();
     this.handle = (...args) => this.app(...args);
     this.set = (...args) => this.app.set(...args);
-    this.use = (...args) => {
-      if (typeof args[0] === 'string') {
-        args[0] = path.join(baseUrl, args[0]);
-      }
-      this.app.use(...args);
-    };
+    this.use = (...args) => this.app.use(...args);
   }
 
   useView() {
@@ -33,9 +28,12 @@ class App {
     this.set('etag', false);
     this.set('x-powered-by', false);
     this.use((req, res, next) => {
-      res.header('access-control-allow-origin', `https://${req.headers.host}`);
-      res.header('server', 'acl-ingress-k8s');
-      res.header('x-powered-by', 'jsx.jp');
+      const origin = req.headers.origin || `${req.protocol}://${req.headers.host}`;
+      res.header('Access-Control-Allow-Origin', `${origin}`);
+      res.header('Access-Control-Allow-Methods', 'GET, POST, HEAD');
+      res.header('Access-Control-Allow-Headers', 'Content-Type');
+      res.header('Content-Type', 'application/json');
+      res.header('Server', 'acl-ingress-k8s');
       next();
     });
   }

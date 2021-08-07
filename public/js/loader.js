@@ -29,7 +29,7 @@ class Loader {
   trigger() {
     const placeholders = document.querySelectorAll('div[id^=template-]');
     placeholders.forEach(placeholder => {
-      const params = ['/v1/template', {
+      const params = ['/template', {
         method: 'post',
         headers: {
           'Content-Type': 'application/json; charset=utf-8',

@@ -1,6 +1,6 @@
 /* eslint-env browser */
-class Register {
-  register(event) {
+class Reset {
+  reset(event) {
     event.preventDefault();
     const login = document.querySelector('#login').value;
     const password = document.querySelector('#password').value;
@@ -11,7 +11,7 @@ class Register {
       return;
     }
     status.textContent = '';
-    const params = ['/v1/user/register', {
+    const params = ['/user/reset', {
       method: 'post',
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
@@ -24,18 +24,20 @@ class Register {
       status.textContent = `${res.status} ${res.statusText}`;
       if (res.status !== 200) {
         res.json()
-        .then(json => status.textContent += ` (${json.message})`);
+        .then(json => {
+          status.textContent += ` (${json.message})`;
+        });
         return;
       }
-      status.textContent += ' User Added';
+      status.textContent += ' User Reset';
       document.form.reset();
     });
   }
 
   trigger() {
     document.querySelector('form')
-    .addEventListener('submit', event => this.register(event));
+    .addEventListener('submit', event => this.reset(event));
   }
 }
 
-window.addEventListener('DOMContentLoaded', () => new Register().trigger());
+window.addEventListener('DOMContentLoaded', () => new Reset().trigger());

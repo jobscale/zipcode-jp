@@ -1,17 +1,18 @@
 {
-  "name": "node-express-ejs",
+  "name": "tanpo",
   "private": true,
+  "version": "0.0.1",
   "description": "node express ejs template SSR MVC",
   "author": "jobscale <jobscale@users.noreply.github.com>",
-  "version": "0.0.0",
   "main": "index.js",
   "scripts": {
     "start": "node .",
     "lint": "eslint . && ejslint app/views",
-    "lint:fix": "eslint . --fix",
     "test": "npm run lint"
   },
   "dependencies": {
+    "@jobscale/core": "0.0.3",
+    "@jobscale/slack": "0.0.2",
     "cookie-parser": "^1.4.5",
     "ejs": "^3.1.6",
     "express": "^4.17.1",
@@ -27,12 +28,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jobscale/node-express-ejs-authorization.git"
+    "url": "git+https://github.com/jobscale/tanpo.git"
   },
-  "keywords": [],
-  "bugs": {
-    "url": "https://github.com/jobscale/node-express-ejs-authorization/issues"
-  },
-  "homepage": "https://github.com/jobscale/node-express-ejs-authorization#readme",
   "license": "MIT"
 }
