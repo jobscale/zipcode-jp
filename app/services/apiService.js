@@ -18,11 +18,15 @@ class ApiService extends Service {
   fetchEnv() {
     if (!this.cache) this.cache = {};
     if (this.cache.env) return Promise.resolve(this.cache.env);
-    // const Host = 'https://partner.credentials.svc.cluster.local';
-    const Host = 'https://127.0.0.1:3443';
+    const params = {
+      host: 'https://partner.credentials.svc.cluster.local',
+    };
+    if (process.env.SLACK_HOST) {
+      params.host = process.env.SLACK_HOST;
+    }
     const Cookie = 'X-AUTH=X0X0X0X0X0X0X0X';
     const request = [
-      `${Host}/slack.env.json`,
+      `${params.host}/slack.env.json`,
       { method: 'GET', headers: { Cookie } },
     ];
     return this.allowInsecure()
