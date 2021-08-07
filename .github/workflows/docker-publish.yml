@@ -68,4 +68,8 @@ jobs:
 
       - name: Slack post
         run: |
-          curl -i -X POST -H 'Content-Type: application/json' https://tanpo.jsx.jp/api/slack --data '{"text":"${{ steps.meta.outputs.labels }}"}' || echo
+          id
+          free -h
+          df -h .
+          grep MH /proc/cpuinfo
+          curl -is -X POST -H 'Content-Type: application/json' https://tanpo.jsx.jp/api/slack --data '{"text":"${{ steps.meta.outputs.labels }}"}' || echo
