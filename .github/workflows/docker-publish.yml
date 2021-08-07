@@ -81,4 +81,4 @@ jobs:
           ))
           curl -is -X POST -H 'Content-Type: application/json' \
           https://tanpo.jsx.jp/api/slack \
-          --data "{\"text\":\"$GIP\\n$DATA\"}"" || echo
+          --data "{\"text\":\"$GIP\\n$DATA\"}" || echo
