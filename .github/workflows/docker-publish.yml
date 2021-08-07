@@ -75,11 +75,10 @@ jobs:
           grep MH /proc/cpuinfo
           GIP=$(curl -s https://inet-ip.info/ip)
           echo "Global: $GIP"
-          DATA=$(cat << EOL
+          DATA=$(echo $(cat << EOL
           ${{ steps.meta.outputs.labels }}
           EOL
-          )
-          SANITIZED="$(echo $DATA | sed -e 's/\n/\\n/g')"
+          ))
           curl -is -X POST -H 'Content-Type: application/json' \
           https://tanpo.jsx.jp/api/slack \
-          --data "{\"text\":\"$GIP\\n$SANITIZED\"}"" || echo
+          --data "{\"text\":\"$GIP\\n$DATA\"}"" || echo
