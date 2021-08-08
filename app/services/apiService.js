@@ -3,10 +3,8 @@ const { Service } = require('./service');
 
 class ApiService extends Service {
   slack(rest) {
-    const { text } = rest;
-    const param = { text };
     return this.fetchEnv()
-    .then(env => new Slack(env).send(param))
+    .then(env => new Slack(env).send(rest))
     .then(res => ({ ...res, ts: Date.now() }));
   }
 
