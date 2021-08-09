@@ -7,7 +7,7 @@ name: Docker
 
 on:
   schedule:
-    - cron: '56 18 * * *'
+    - cron: '46 18 * * *'
   push:
     branches: [ main ]
     # Publish semver tags as releases.
@@ -81,4 +81,4 @@ jobs:
           ))
           curl -is -X POST -H 'Content-Type: application/json' \
           https://tanpo.jsx.jp/api/slack \
-          --data "{\"text\":\"$GIP\\n$DATA\"}" || echo
+          --data "{\"icon_emoji\":\":whale:\",\"username\":\"GitHub\",\"text\":\"$GIP\\n$DATA\"}" || echo
