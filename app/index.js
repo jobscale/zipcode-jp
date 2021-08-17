@@ -32,7 +32,6 @@ class App {
       res.header('Access-Control-Allow-Origin', `${origin}`);
       res.header('Access-Control-Allow-Methods', 'GET, POST, HEAD');
       res.header('Access-Control-Allow-Headers', 'Content-Type');
-      res.header('Content-Type', 'application/json');
       res.header('Server', 'acl-ingress-k8s');
       next();
     });
