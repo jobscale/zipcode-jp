@@ -3,7 +3,7 @@ const createError = require('http-errors');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 require('@jobscale/core');
-const { topRoute } = require('./routes/topRoute');
+const { topRoute } = require('./top/route');
 
 class App {
   constructor() {
