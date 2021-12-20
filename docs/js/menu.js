@@ -28,7 +28,7 @@ class Menu extends App {
   }
 
   trigger() {
-    document.logout = this.logoutInternal;
+    document.logout = () => this.logoutInternal();
     document.querySelector('#logout')
     .addEventListener('click', event => this.logout(event));
     document.querySelector('.nav-trigger')
