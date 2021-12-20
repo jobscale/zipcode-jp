@@ -5,7 +5,7 @@ class Reset extends App {
     event.preventDefault();
     this.loading();
     this.resetInternal()
-    .catch(e => logger.error(e))
+    .catch(e => logger.error(e.message))
     .then(() => this.loading(true));
   }
 
@@ -27,7 +27,7 @@ class Reset extends App {
       },
       body: JSON.stringify({ login, password }),
     }];
-    return fetch(...params)
+    return this.fetch(...params)
     .then(res => {
       status.textContent = `${res.status} ${res.statusText}`;
       if (res.status !== 200) {

@@ -5,7 +5,7 @@ class Login extends App {
     event.preventDefault();
     this.loading();
     this.loginInternal()
-    .catch(e => logger.error(e))
+    .catch(e => logger.error(e.message))
     .then(() => this.loading(true));
   }
 
@@ -22,7 +22,7 @@ class Login extends App {
       },
       body: JSON.stringify({ login, password }),
     }];
-    return fetch(...params)
+    return this.fetch(...params)
     .then(res => {
       status.textContent = `${res.status} ${res.statusText}`;
       if (res.status !== 200) {
