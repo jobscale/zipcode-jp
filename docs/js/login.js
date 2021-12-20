@@ -6,7 +6,7 @@ class Login extends App {
     this.loading();
     this.loginInternal()
     .catch(e => logger.error(e))
-    .then(() => this.loading(false));
+    .then(() => this.loading(true));
   }
 
   async loginInternal() {

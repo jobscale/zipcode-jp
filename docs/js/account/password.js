@@ -6,7 +6,7 @@ class Password extends App {
     this.loading();
     this.passwordInternal()
     .catch(e => logger.error(e))
-    .then(() => this.loading(false));
+    .then(() => this.loading(true));
   }
 
   async passwordInternal() {

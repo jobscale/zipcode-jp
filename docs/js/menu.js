@@ -11,7 +11,7 @@ class Menu extends App {
     this.loading();
     this.logoutInternal()
     .catch(e => logger.error(e))
-    .then(() => this.loading(false));
+    .then(() => this.loading(true));
   }
 
   async logoutInternal() {

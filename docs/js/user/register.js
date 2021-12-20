@@ -6,7 +6,7 @@ class Register extends App {
     this.loading();
     this.registerInternal()
     .catch(e => logger.error(e))
-    .then(() => this.loading(false));
+    .then(() => this.loading(true));
   }
 
   async registerInternal() {
