@@ -22,6 +22,8 @@ class App {
   }
 
   wait(milliseconds) {
-    return new Promise(resolve => setTimeout(resolve, milliseconds));
+    return new Promise(resolve => {
+      setTimeout(resolve, milliseconds);
+    });
   }
 }
