@@ -8,9 +8,10 @@ class Menu extends App {
 
   logout(event) {
     event.preventDefault();
-    this.loading();
+    const see = this.loading();
     this.logoutInternal()
     .catch(e => logger.error(e.message))
+    .then(() => see)
     .then(() => this.loading(true));
   }
 
