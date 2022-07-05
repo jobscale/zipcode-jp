@@ -29,8 +29,8 @@ class HttpServer extends Server {
   onListening() {
     const bind = this.address();
     bind.ts = new Date().toLocaleString();
+    bind['Listen on'] = `http://127.0.0.1:${bind.port}`;
     logger.info(bind);
-    logger.info(`Listen on http://127.0.0.1:${bind.port}`);
   }
 }
 
