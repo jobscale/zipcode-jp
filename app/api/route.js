@@ -7,13 +7,13 @@ const router = Router();
 class ApiRoute {
   constructor() {
     router.post(
-      '/slack',
-      (...args) => apiValidation.slack(...args),
-      (...args) => apiController.slack(...args),
-    );
-    router.post(
       '/hostname',
       (...args) => apiController.hostname(...args),
+    );
+    router.post(
+      '/find',
+      (...args) => apiValidation.find(...args),
+      (...args) => apiController.find(...args),
     );
     this.router = router;
   }

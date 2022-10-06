@@ -1,11 +1,15 @@
 const dayjs = require('dayjs');
+const createError = require('http-errors');
 const { authService } = require('./service');
 
 class AuthController {
   index(req, res) {
-    authService.now()
-    .then((now) => {
-      res.render('auth/login', { title: 'Login', now });
+    const { remoteAddress } = req.socket;
+    Promise.resolve(new Date().toISOString())
+    .then(now => {
+      const ip = req.headers['x-forwarded-for'] || remoteAddress;
+      const e = createError(401);
+      res.status(e.status).send(`${now} ${e.message} ${ip}`);
     });
   }
 

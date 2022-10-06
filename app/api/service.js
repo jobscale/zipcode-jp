@@ -1,13 +1,8 @@
 const os = require('os');
-const { Slack } = require('@jobscale/slack');
+const { Op } = require('sequelize');
+const Ken = require('../models/Ken');
 
 class ApiService {
-  slack(rest) {
-    return this.fetchEnv()
-    .then(env => new Slack(env).send(rest))
-    .then(res => ({ ...res, ts: Date.now() }));
-  }
-
   async hostname() {
     return {
       hostname: os.hostname(),
@@ -15,33 +10,20 @@ class ApiService {
     };
   }
 
-  async allowInsecure(use) {
-    if (use === false) delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
-    else process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-  }
-
-  fetchEnv() {
-    if (!this.cache) this.cache = {};
-    if (this.cache.env) return Promise.resolve(this.cache.env);
-    const params = {
-      host: 'https://partner.credentials.svc.cluster.local',
+  async find(rest) {
+    const { code } = rest;
+    if (code.length < 4) return [];
+    const options = {
+      raw: true,
+      attributes: [
+        ['postal_code7', 'code'], 'pref', 'city', 'address',
+      ],
+      where: {
+        postal_code7: { [Op.like]: `${code}%` },
+      },
+      limit: 20,
     };
-    if (process.env.SLACK_HOST) {
-      params.host = process.env.SLACK_HOST;
-    }
-    const Cookie = 'X-AUTH=X0X0X0X0X0X0X0X';
-    const request = [
-      `${params.host}/slack.env.json`,
-      { method: 'GET', headers: { Cookie } },
-    ];
-    return this.allowInsecure()
-    .then(() => fetch(...request))
-    .then(res => this.allowInsecure(false) && res)
-    .then(res => res.json())
-    .then(env => {
-      this.cache.env = env;
-      return env;
-    });
+    return Ken.findAll(options);
   }
 }
 

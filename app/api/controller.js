@@ -1,22 +1,22 @@
 const { apiService } = require('./service');
 
 class ApiController {
-  slack(req, res) {
-    const { body } = req;
-    apiService.slack(body)
+  hostname(req, res) {
+    apiService.hostname()
     .then(result => res.json(result))
     .catch(e => {
-      logger.info({ message: e.toString() });
+      logger.info({ message: e.message });
       if (!e.status) e.status = 500;
       res.status(e.status).json({ message: e.message });
     });
   }
 
-  hostname(req, res) {
-    apiService.hostname()
+  find(req, res) {
+    const { code } = req.body;
+    apiService.find({ code })
     .then(result => res.json(result))
     .catch(e => {
-      logger.info({ message: e.toString() });
+      logger.info({ message: e.message });
       if (!e.status) e.status = 500;
       res.status(e.status).json({ message: e.message });
     });

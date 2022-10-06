@@ -61,5 +61,7 @@ typings/
 .next
 
 .vscode/
-db/
 package-lock.json
+
+db/
+ken_all.zip

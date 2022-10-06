@@ -14,13 +14,13 @@ RUN chown -R node. /usr/local/lib/node_modules && chown -R :node /usr/local/bin 
 USER node
 RUN npm i --location=global npm && npm version | xargs
 COPY --chown=node:staff create.sql .
-RUN sqlite3 db < create.sql
+RUN mkdir db && sqlite3 db/database.sqlite < create.sql
 RUN curl -sL -O https://www.post.japanpost.jp/zipcode/dl/kogaki/zip/ken_all.zip \
- && zcat ken_all.zip | iconv -f sjis -t utf8 | sqlite3 -separator , db ".import /dev/stdin ken"
-RUN sqlite3 db "SELECT * FROM ken WHERE postal_code7 like '534002%' limit 2 offset 2"
+ && zcat ken_all.zip | iconv -f sjis -t utf8 | sqlite3 -separator , db/database.sqlite ".import /dev/stdin ken"
+RUN sqlite3 db/database.sqlite "SELECT * FROM ken WHERE postal_code7 like '534002%' limit 2 offset 2"
 
 COPY --chown=node:staff . .
-RUN npm i --production
+RUN npm i --omit=dev
 
 EXPOSE 3000
 CMD ["npm", "start"]

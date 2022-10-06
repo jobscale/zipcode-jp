@@ -1,34 +1,24 @@
 const os = require('os');
-const path = require('path');
 const createError = require('http-errors');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 require('@jobscale/core');
-const { topRoute } = require('./top/route');
+const { route } = require('./route');
+
+const app = express();
+const uriBase = '';
 
 class App {
-  constructor() {
-    this.app = express();
-    this.handle = (...args) => this.app(...args);
-    this.set = (...args) => this.app.set(...args);
-    this.use = (...args) => this.app.use(...args);
-  }
-
-  useView() {
-    this.set('views', path.resolve(__dirname, 'views'));
-    this.set('view engine', 'ejs');
-  }
-
   useParser() {
-    this.use(express.json());
-    this.use(express.urlencoded({ extended: false }));
-    this.use(cookieParser());
+    app.use(express.json());
+    app.use(express.urlencoded({ extended: false }));
+    app.use(cookieParser());
   }
 
   useHeader() {
-    this.set('etag', false);
-    this.set('x-powered-by', false);
-    this.use((req, res, next) => {
+    app.set('etag', false);
+    app.set('x-powered-by', false);
+    app.use((req, res, next) => {
       const origin = req.headers.origin || `${req.protocol}://${req.headers.host}`;
       res.header('Access-Control-Allow-Origin', `${origin}`);
       res.header('Access-Control-Allow-Methods', 'GET, POST, HEAD');
@@ -39,12 +29,8 @@ class App {
     });
   }
 
-  usePublic() {
-    this.use(express.static(path.resolve(__dirname, '../docs')));
-  }
-
   useLogging() {
-    this.use((req, res, next) => {
+    app.use((req, res, next) => {
       const ts = new Date().toLocaleString();
       const progress = () => {
         const remoteIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -67,16 +53,15 @@ class App {
   }
 
   useRoute() {
-    this.use('', topRoute.router);
+    app.use(uriBase, route.router);
   }
 
   notfoundHandler() {
-    this.use((req, res) => {
-      const template = 'error/default';
+    app.use((req, res) => {
       if (req.method === 'GET') {
         const e = createError(404);
         res.locals.e = e;
-        res.status(e.status).render(template);
+        res.status(e.status).send(e.message);
         return;
       }
       const e = createError(501);
@@ -85,13 +70,12 @@ class App {
   }
 
   errorHandler() {
-    this.use((e, req, res, done) => {
+    app.use((e, req, res, done) => {
       (never => never)(done);
-      const template = 'error/default';
       if (!e.status) e.status = 503;
       if (req.method === 'GET') {
         res.locals.e = e;
-        res.status(e.status).render(template);
+        res.status(e.status).send(e.message);
         return;
       }
       res.status(e.status).json({ message: e.message });
@@ -99,15 +83,13 @@ class App {
   }
 
   start() {
-    this.useView();
     this.useParser();
     this.useHeader();
-    this.usePublic();
     this.useLogging();
     this.useRoute();
     this.notfoundHandler();
     this.errorHandler();
-    return this.handle;
+    return app;
   }
 }
 
