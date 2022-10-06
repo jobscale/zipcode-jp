@@ -1,4 +1,5 @@
 const os = require('os');
+const path = require('path');
 const createError = require('http-errors');
 const express = require('express');
 const cookieParser = require('cookie-parser');
@@ -6,10 +7,10 @@ require('@jobscale/core');
 const { route } = require('./route');
 
 const app = express();
-const uriBase = '';
 
 class App {
   useParser() {
+    app.use(express.static(path.join(process.cwd(), 'docs')));
     app.use(express.json());
     app.use(express.urlencoded({ extended: false }));
     app.use(cookieParser());
@@ -53,7 +54,7 @@ class App {
   }
 
   useRoute() {
-    app.use(uriBase, route.router);
+    app.use('', route.router);
   }
 
   notfoundHandler() {

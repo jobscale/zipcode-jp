@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/style.css" />
+    <title>Postal Zip Code Search</title>
+  </head>
+
+  <body>
+    <div id="app">
+      <div class="content">
+        <section>
+          <input class="input" type="search" maxlength="7" placeholder="Zip Code"
+            v-model="code"
+            @keyup="update"
+          >
+        </section>
+        <section>
+          <select class="select" size="5.5">
+            <option v-for="item of list" :value="item.code">
+              {{ item.code }} {{ item.pref }} {{ item.city }} {{ item.address }}
+            </option>
+          </select>
+        </section>
+      </div>
+    </div>
+    <script defer src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script defer src="js/index.js"></script>
+  </body>
+</html>

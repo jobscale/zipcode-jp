@@ -1,0 +1,31 @@
+:root {
+  --font-size: 3vmin;
+}
+
+* {
+  font-size: var(--font-size);
+}
+
+body {
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+}
+
+.input {
+  width: 7em;
+}
+
+.select, .select:focus {
+  width: 25em;
+  border: 1px solid #ccc;
+  background: #ddd solid 1px;
+}

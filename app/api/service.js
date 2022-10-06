@@ -19,9 +19,15 @@ class ApiService {
         ['postal_code7', 'code'], 'pref', 'city', 'address',
       ],
       where: {
-        postal_code7: { [Op.like]: `${code}%` },
+        postal_code7: {
+          [Op.like]: `${code}%`,
+          [Op.notLike]: '%0000',
+        },
       },
-      limit: 20,
+      order: [
+        ['code', 'asc'],
+      ],
+      limit: 100,
     };
     return Ken.findAll(options);
   }
