@@ -1,9 +1,14 @@
 {
-  "name": "tanpo",
+  "name": "zipcode-jp",
   "private": true,
   "version": "0.0.1",
   "description": "node express ejs template SSR MVC",
   "author": "jobscale <jobscale@users.noreply.github.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jobscale/zipcode-jp.git"
+  },
+  "license": "MIT",
   "main": "index.js",
   "scripts": {
     "start": "node .",
@@ -17,23 +22,18 @@
     "@jobscale/core": "^0.0.18",
     "@jobscale/slack": "^0.0.4",
     "cookie-parser": "^1.4.6",
-    "dayjs": "^1.11.3",
+    "dayjs": "^1.11.5",
     "ejs": "^3.1.8",
     "express": "^4.18.1",
     "http-errors": "^2.0.0",
-    "joi": "^17.6.0",
+    "joi": "^17.6.2",
     "jws": "^4.0.0"
   },
   "devDependencies": {
     "ejs-lint": "^1.2.2",
-    "eslint": "^8.19.0",
+    "eslint": "^8.24.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.26.0",
     "pre-commit": "^1.2.2"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/jobscale/tanpo.git"
-  },
-  "license": "MIT"
+  }
 }

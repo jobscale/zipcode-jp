@@ -1,4 +1,4 @@
-const { Route } = require('../route');
+const { Router } = require('express');
 const { apiRoute } = require('../api/route');
 const { authRoute } = require('../auth/route');
 const { accountRoute } = require('../account/route');
@@ -6,33 +6,35 @@ const { userRoute } = require('../user/route');
 const { templateRoute } = require('../template/route');
 const { topController } = require('./controller');
 
-class TopRoute extends Route {
+const router = Router();
+
+class TopRoute {
   constructor() {
-    super();
-    this.use(
+    router.use(
       '/api',
       (...args) => apiRoute.router(...args),
     );
-    this.use(
+    router.use(
       '',
       (...args) => authRoute.router(...args),
     );
-    this.use(
+    router.use(
       '/account',
       (...args) => accountRoute.router(...args),
     );
-    this.use(
+    router.use(
       '/user',
       (...args) => userRoute.router(...args),
     );
-    this.use(
+    router.use(
       '/template',
       (...args) => templateRoute.router(...args),
     );
-    this.get(
+    router.get(
       '',
       (...args) => topController.page(...args),
     );
+    this.router = router;
   }
 }
 

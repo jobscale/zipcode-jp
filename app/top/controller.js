@@ -1,7 +1,6 @@
-const { Controller } = require('../controller');
 const { topService } = require('./service');
 
-class TopController extends Controller {
+class TopController {
   page(req, res) {
     topService.now()
     .then(now => {

@@ -1,6 +1,4 @@
-const { Service } = require('../service');
-
-class TopService extends Service {
+class TopService {
 }
 
 module.exports = {
