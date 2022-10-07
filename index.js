@@ -1,8 +1,8 @@
 const { App } = require('./app');
 
 const main = () => {
-  const pro = {};
-  pro.pending = new Promise(resolve => { pro.resolve = resolve; });
+  const prom = {};
+  prom.pending = new Promise(resolve => { prom.resolve = resolve; });
   const app = new App().start();
   const options = {
     host: '0.0.0.0',
@@ -13,9 +13,9 @@ const main = () => {
       Server: 'Started',
       'Listen on': `http://127.0.0.1:${options.port}`,
     }, null, 2));
-    pro.resolve(app);
+    prom.resolve(app);
   });
-  return pro.pending;
+  return prom.pending;
 };
 
 module.exports = {
