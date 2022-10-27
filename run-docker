@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -eu
+
+{
+  docker build . -t zipcode:local \
+  && docker run --rm --name zipcode \
+  --network vnet \
+  -p 3000:3000 \
+  -v $PWD/docs:/home/node/docs \
+  -it zipcode:local
+}

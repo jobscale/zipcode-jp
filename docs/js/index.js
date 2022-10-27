@@ -27,5 +27,11 @@ Vue.createApp({
       .then(res => res.json())
       .then(list => { this.list = list; });
     },
+
+    onColorScheme() {
+      const html = document.querySelector('html');
+      html.classList.toggle('dark-scheme');
+      html.classList.toggle('light-scheme');
+    },
   },
 }).mount('#app');

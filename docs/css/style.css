@@ -2,30 +2,39 @@
   --font-size: 3vmin;
 }
 
+.dark-scheme {
+  color-scheme: dark;
+}
+
+.light-scheme {
+  color-scheme: light;
+}
+
 * {
   font-size: var(--font-size);
+  background-color: transparent;
+  border-radius: 0.5em;
 }
 
 body {
   margin: 0;
-  width: 100vw;
+  padding: 0;
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.content {
-  display: flex;
-  flex-direction: column;
+.input, .select, .option, .button {
+  padding: 0.2em 0.5em;
+  margin: 0.2em;
+  border: 1px solid #888;
 }
 
 .input {
   width: 7em;
 }
 
-.select, .select:focus {
+.select {
   width: 25em;
-  border: 1px solid #ccc;
-  background: #ddd solid 1px;
 }
