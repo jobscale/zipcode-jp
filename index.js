@@ -1,3 +1,4 @@
+const { logger } = require('@jobscale/logger');
 const { App } = require('./app');
 
 const main = () => {

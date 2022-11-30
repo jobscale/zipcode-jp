@@ -1,5 +1,6 @@
 const dayjs = require('dayjs');
 const createError = require('http-errors');
+const { logger } = require('@jobscale/logger');
 const { authService } = require('./service');
 
 class AuthController {
