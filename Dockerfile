@@ -19,8 +19,11 @@ RUN curl -sL -O https://www.post.japanpost.jp/zipcode/dl/kogaki/zip/ken_all.zip 
  && zcat ken_all.zip | iconv -f sjis -t utf8 | sqlite3 -separator , db/database.sqlite ".import /dev/stdin ken"
 RUN sqlite3 db/database.sqlite "SELECT * FROM ken WHERE postal_code7 like '534002%' limit 2 offset 2"
 
-COPY --chown=node:staff . .
+COPY --chown=node:staff package.json .
 RUN npm i --omit=dev
+COPY --chown=node:staff index.js .
+COPY --chown=node:staff app app
+COPY --chown=node:staff docs docs
 
 EXPOSE 3000
 CMD ["npm", "start"]
