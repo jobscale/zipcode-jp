@@ -24,6 +24,7 @@ RUN npm i --omit=dev
 COPY --chown=node:staff index.js .
 COPY --chown=node:staff app app
 COPY --chown=node:staff docs docs
+COPY --chown=node:staff config config
 
 EXPOSE 3000
 CMD ["npm", "start"]
