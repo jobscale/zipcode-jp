@@ -1,4 +1,4 @@
-const { logger } = require('@jobscale/logger');
+const logger = console;
 
 Vue.createApp({
   data() {
