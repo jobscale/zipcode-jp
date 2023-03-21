@@ -12,7 +12,7 @@ class ApiService {
 
   async find(rest) {
     const { code } = rest;
-    if (code.length < 4) return [];
+    if (code.length < 3) return [];
     const options = {
       raw: true,
       attributes: [
