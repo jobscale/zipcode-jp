@@ -6,6 +6,7 @@ Vue.createApp({
       findId: undefined,
       loadId: undefined,
       code: '',
+      listCode: '',
       list: [],
       perf: undefined,
     };
@@ -13,6 +14,8 @@ Vue.createApp({
 
   methods: {
     update() {
+      if (this.listCode === this.code) return;
+      this.listCode = this.code;
       clearTimeout(this.findId);
       if (this.code.length < 3) return;
       this.findId = setTimeout(() => this.find(), 200);
