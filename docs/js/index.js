@@ -12,7 +12,7 @@ Vue.createApp({
   methods: {
     update() {
       clearTimeout(this.id);
-      if (this.code.length < 4) return;
+      if (this.code.length < 3) return;
       this.id = setTimeout(() => this.find(), 200);
     },
 
@@ -23,9 +23,24 @@ Vue.createApp({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: this.code }),
       }];
+      this.loading();
       fetch(...params)
       .then(res => res.json())
-      .then(list => { this.list = list; });
+      .then(list => { this.list = list; })
+      .catch(e => logger.error(e))
+      .then(() => {
+        this.loading(false);
+      });
+    },
+
+    loading(on) {
+      if (on !== false) {
+        this.$refs.loading.classList.remove('hide');
+        return;
+      }
+      setTimeout(() => {
+        this.$refs.loading.classList.add('hide');
+      }, 1500);
     },
 
     onColorScheme() {
