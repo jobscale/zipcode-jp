@@ -18,15 +18,16 @@ Vue.createApp({
       this.listCode = this.code;
       clearTimeout(this.findId);
       if (this.code.length < 3) return;
-      this.findId = setTimeout(() => this.find(), 200);
+      const { code } = this;
+      this.findId = setTimeout(() => this.find(code), 200);
     },
 
-    find() {
-      logger.info('code', this.code);
+    find(code) {
+      logger.info({ code });
       const params = ['/api/find', {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: this.code }),
+        body: JSON.stringify({ code }),
       }];
       this.perf = undefined;
       const begin = Date.now();
