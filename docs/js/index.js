@@ -3,7 +3,8 @@ const logger = console;
 Vue.createApp({
   data() {
     return {
-      id: undefined,
+      findId: undefined,
+      loadId: undefined,
       code: '',
       list: [],
     };
@@ -11,9 +12,9 @@ Vue.createApp({
 
   methods: {
     update() {
-      clearTimeout(this.id);
+      clearTimeout(this.findId);
       if (this.code.length < 3) return;
-      this.id = setTimeout(() => this.find(), 200);
+      this.findId = setTimeout(() => this.find(), 200);
     },
 
     find() {
@@ -38,7 +39,8 @@ Vue.createApp({
         this.$refs.loading.classList.remove('hide');
         return;
       }
-      setTimeout(() => {
+      clearTimeout(this.loadId);
+      this.loadId = setTimeout(() => {
         this.$refs.loading.classList.add('hide');
       }, 1500);
     },
