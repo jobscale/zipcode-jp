@@ -41,6 +41,10 @@ body {
   width: 7em;
 }
 
+.right {
+  text-align: right;
+}
+
 .select {
   width: 25em;
 }

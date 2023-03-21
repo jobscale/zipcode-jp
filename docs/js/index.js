@@ -7,6 +7,7 @@ Vue.createApp({
       loadId: undefined,
       code: '',
       list: [],
+      perf: undefined,
     };
   },
 
@@ -24,10 +25,18 @@ Vue.createApp({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: this.code }),
       }];
+      delete this.perf;
+      const begin = Date.now();
       this.loading();
       fetch(...params)
-      .then(res => res.json())
-      .then(list => { this.list = list; })
+      .then(res => {
+        if (res.status !== 200) return [];
+        return res.json();
+      })
+      .then(list => {
+        this.perf = (Date.now() - begin) / 1000;
+        this.list = list;
+      })
       .catch(e => logger.error(e))
       .then(() => {
         this.loading(false);
