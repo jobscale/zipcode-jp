@@ -8,6 +8,7 @@ Vue.createApp({
       code: '',
       listCode: '',
       list: [],
+      selectedCode: '5400002',
       perf: undefined,
     };
   },

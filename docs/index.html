@@ -133,7 +133,7 @@
           </div>
         </section>
         <section>
-          <select class="select" size="5.5">
+          <select class="select" size="5.5" v-model="selectedCode">
             <option class="option" v-for="item of list" :value="item.code">
               {{ item.code }} {{ item.pref }} {{ item.city }} {{ item.address }}
             </option>
@@ -142,6 +142,14 @@
         </section>
         <section>
           <button @click="onColorScheme" class="button">Color Scheme</button>
+        </section>
+        <section>
+          <!-- powered by https://www.embed-map.com -->
+          <a href="https://www.embed-map.com" target="_blank">
+            <iframe loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"
+              :src="`https://www.google.com/maps/embed/v1/place?q=${selectedCode}&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8`">
+            </iframe>
+          </a>
         </section>
       </div>
     </div>
