@@ -25,7 +25,7 @@ Vue.createApp({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: this.code }),
       }];
-      delete this.perf;
+      this.perf = undefined;
       const begin = Date.now();
       this.loading();
       fetch(...params)
