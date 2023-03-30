@@ -1,0 +1,4 @@
+curl 'https://zipcode-jp.jsx.jp/api/find' \
+  -H 'content-type: application/json' \
+  --data-raw '{"code":"540000"}' \
+  --compressed

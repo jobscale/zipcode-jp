@@ -4,3 +4,8 @@
 
 [zipcode-jp.jsx.jp](https://zipcode-jp.jsx.jp)
 
+## examples
+
+```
+./curl-sample
+```
