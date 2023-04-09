@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="css/style.css" />
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.37/vue.global.prod.min.js"></script>
+    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.3.0/css/all.css">
     <title>Postal Zip Code Search</title>
   </head>
 
@@ -141,7 +142,9 @@
           <div v-show="perf" class="right">{{ perf }} <span class="small">sec</span></div>
         </section>
         <section>
-          <button @click="onColorScheme" class="button">Color Scheme</button>
+          <button @click="onColorScheme" class="button">
+            <i class="fa-solid fa-bagel"></i>
+          </button>
         </section>
         <section>
           <!-- powered by https://www.embed-map.com -->

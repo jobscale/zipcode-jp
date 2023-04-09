@@ -37,6 +37,10 @@ body {
   justify-content: center;
 }
 
+button {
+  cursor: pointer;
+}
+
 .page-title {
   font-size: 2em;
   margin-bottom: 1em;
