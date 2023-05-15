@@ -1,8 +1,7 @@
 FROM public.ecr.aws/lambda/nodejs:18
 SHELL ["bash", "-c"]
 
-RUN yum install -y \
-    git curl unzip sqlite3 locales
+RUN yum install -y git curl unzip sqlite3 locales
 
 COPY package.json package.json
 RUN npm i aws-serverless-express

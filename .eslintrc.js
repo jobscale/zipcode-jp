@@ -3,6 +3,11 @@ module.exports = {
   globals: {
     Vue: 'readonly',
   },
+  settings: {
+    'import/core-modules': [
+      'aws-serverless-express',
+    ],
+  },
   env: { browser: true },
   rules: {
     indent: ['error', 2, { MemberExpression: 0 }],
