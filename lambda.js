@@ -1,9 +1,18 @@
+const fs = require('fs');
 const awsServerlessExpress = require('aws-serverless-express');
 const logger = require('@jobscale/logger');
 const { server: application } = require('.');
 
+const distribution = () => {
+  const env = Buffer.from(fs.readFileSync('/etc/os-release')).toString();
+  logger.info({ env });
+  return env;
+};
+
 exports.handler = async event => {
   logger.info('EVENT', JSON.stringify(event, null, 2));
+
+  distribution();
 
   return application
   .then(app => awsServerlessExpress.createServer(app))
