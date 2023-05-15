@@ -1,6 +1,8 @@
 ARG FUNCTION_DIR="/var/task"
 
-FROM node:16.14.2-bullseye as build-image
+FROM node:18-bullseye-slim as node-base
+
+FROM node-base as build-image
 SHELL ["bash", "-c"]
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -17,7 +19,7 @@ COPY package.json package.json
 RUN npm i aws-lambda-ric aws-serverless-express
 RUN npm i --production
 
-FROM node:16.14.2-bullseye-slim
+FROM node-base
 SHELL ["bash", "-c"]
 
 RUN apt-get update && \
