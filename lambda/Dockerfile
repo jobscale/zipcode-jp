@@ -7,7 +7,7 @@ COPY package.json package.json
 RUN npm i aws-serverless-express
 RUN npm i --omit=dev
 
-COPY --chown=node:staff create.sql .
+COPY create.sql .
 RUN mkdir db && sqlite3 db/database.sqlite < create.sql
 RUN curl -sL -O https://www.post.japanpost.jp/zipcode/dl/kogaki/zip/ken_all.zip \
  && zcat ken_all.zip | iconv -f sjis -t utf8 | sqlite3 -separator , db/database.sqlite ".import /dev/stdin ken"
