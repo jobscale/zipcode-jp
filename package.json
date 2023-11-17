@@ -6,7 +6,7 @@
   "author": "jobscale <jobscale@users.noreply.github.com>",
   "repository": {
     "type": "git",
-    "url": "git+git@github.com:jobscale/zipcode-jp.git"
+    "url": "git+https://github.com/jobscale/zipcode-jp.git"
   },
   "license": "MIT",
   "main": "index.js",
