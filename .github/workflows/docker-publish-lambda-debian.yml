@@ -7,7 +7,7 @@ name: Docker lambda-debian
 
 on:
   schedule:
-    - cron: '43 17 * * *'
+    - cron: '43 17 * * 1'
   push:
     branches: [ main ]
     # Publish semver tags as releases.
