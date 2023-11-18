@@ -58,6 +58,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
+            rev${{ github.run_number }}-lambda-debian
             type=raw,value=lambda-debian
 
       # Build and push Docker image with Buildx (don't push on PR)
