@@ -16,7 +16,8 @@ ARG FUNCTION_DIR
 WORKDIR ${FUNCTION_DIR}
 
 COPY package.json package.json
-RUN npm i aws-lambda-ric aws-serverless-express && npm i --omit=dev
+RUN npm i aws-lambda-ric
+RUN npm i aws-serverless-express && npm i --omit=dev
 
 FROM node:18-bullseye-slim
 SHELL ["bash", "-c"]

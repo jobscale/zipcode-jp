@@ -12,7 +12,7 @@ RUN sed -i -e 's/# ja_JP.UTF-8 UTF-8/ja_JP.UTF-8 UTF-8/' /etc/locale.gen && loca
 RUN chown -R node. /usr/local/lib/node_modules && chown -R :node /usr/local/bin && chmod -R g+w /usr/local/bin
 
 USER node
-RUN npm i --location=global npm && npm version | xargs
+RUN npm i -g npm@latest && npm version | xargs
 COPY --chown=node:staff create.sql .
 RUN mkdir db && sqlite3 db/database.sqlite < create.sql
 RUN curl -sL -O https://www.post.japanpost.jp/zipcode/dl/kogaki/zip/ken_all.zip \

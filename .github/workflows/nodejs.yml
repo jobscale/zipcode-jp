@@ -1,9 +1,11 @@
 # This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Node.js CI
+name: Nodejs CI
 
 on:
+  # schedule:
+  # - cron: '52 17 * * 1'
   push:
     branches: [ main ]
   pull_request:
@@ -28,5 +30,5 @@ jobs:
       run: npm i
     - name: lint and test
       run: |
-        npm run lint
+        npm run lint --if-present
         npm test
