@@ -14,7 +14,7 @@ RUN chown -R node. /usr/local/lib/node_modules \
  && chown -R :node /usr/local/share && chmod -R g+w /usr/local/share
 
 USER node
-RUN npm i -g npm@latest && npm version | xargs
+RUN npm version | xargs
 COPY --chown=node:staff create.sql .
 RUN mkdir db && sqlite3 db/database.sqlite < create.sql
 RUN curl -sL -O https://www.post.japanpost.jp/zipcode/dl/kogaki/zip/ken_all.zip \
