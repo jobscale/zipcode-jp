@@ -140,7 +140,7 @@ jobs:
           echo "Global: $GIP"
           LABELS=$(echo "${{ steps.meta.outputs.labels }}" | grep -E 'image\.title=|image\.source=' | sed -E 's/org.opencontainers.image.[a-z]+=//' | xargs)
           if [[ -n "${{ matrix.irregular }}" ]]; then
-            LABELS="$(echo $LABELS | sed -e "s/ / ${{ matrix.irregular }} /")"
+            LABELS="$(echo $LABELS | sed -e "s/ /  [ ${{ matrix.irregular }} ]  /")"
           fi
           TAGS=$(echo "${{ steps.meta.outputs.tags }}" | grep -v -E 'latest')
           MESSAGE="$GIP\n$LABELS\n$TAGS"
@@ -154,7 +154,7 @@ jobs:
         run: |
           LABELS=$(echo "${{ steps.meta.outputs.labels }}" | grep -E 'image\.title=|image\.source=' | sed -E 's/org.opencontainers.image.[a-z]+=//' | xargs)
           if [[ -n "${{ matrix.irregular }}" ]]; then
-            LABELS="$(echo $LABELS | sed -e "s/ / ${{ matrix.irregular }} /")"
+            LABELS="$(echo $LABELS | sed -e "s/ /  [ ${{ matrix.irregular }} ]  /")"
           fi
           MESSAGE="$LABELS\nFailed ${{ matrix.name }}"
           DATA=$(echo -e "$MESSAGE" | sed -z -e 's/\n/\\n/g')
