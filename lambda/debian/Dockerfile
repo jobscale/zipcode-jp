@@ -1,6 +1,6 @@
 ARG FUNCTION_DIR="/var/task"
 
-FROM node:lts-bookworm as build-image
+FROM node:lts-bookworm AS build-image
 SHELL ["bash", "-c"]
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -21,7 +21,7 @@ SHELL ["bash", "-c"]
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    git curl unzip sqlite3 locales
+    ca-certificates git curl unzip sqlite3 locales
 RUN apt-get clean && rm -fr /var/lib/apt/lists/*
 
 ARG FUNCTION_DIR
