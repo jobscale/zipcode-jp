@@ -3,14 +3,10 @@ ARG FUNCTION_DIR="/var/task"
 FROM node:lts-bookworm as build-image
 SHELL ["bash", "-c"]
 
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
- && apt-get install -y \
-    g++ \
-    make \
-    cmake \
-    unzip \
-    libcurl4-openssl-dev
+ && apt-get install -y --no-install-recommends \
+    ca-certificates g++ make cmake unzip libcurl4-openssl-dev
 
 ARG FUNCTION_DIR
 WORKDIR ${FUNCTION_DIR}
@@ -22,11 +18,11 @@ RUN npm i aws-serverless-express && npm i --omit=dev
 FROM node:lts-bookworm-slim
 SHELL ["bash", "-c"]
 
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
-    apt-get install -y \
+    apt-get install -y --no-install-recommends \
     git curl unzip sqlite3 locales
-RUN rm -fr /var/lib/apt/lists/*
+RUN apt-get clean && rm -fr /var/lib/apt/lists/*
 
 ARG FUNCTION_DIR
 WORKDIR ${FUNCTION_DIR}

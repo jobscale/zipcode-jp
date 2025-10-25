@@ -1,9 +1,10 @@
-FROM node:lts-bookworm-slim
+FROM node:lts-trixie-slim
 SHELL ["bash", "-c"]
 WORKDIR /home/node
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y --no-install-recommends locales curl git vim sqlite3 unzip \
-  iproute2 dnsutils netcat-openbsd \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  ca-certificates locales curl git vim sqlite3 unzip \
+  iproute2 iputils-ping dnsutils netcat-openbsd \
   less tree jq python3-pip sudo \
  && apt-get clean && rm -fr /var/lib/apt/lists/*
 RUN usermod -aG sudo node && echo '%sudo ALL=(ALL:ALL) NOPASSWD:ALL' > /etc/sudoers.d/40-users
