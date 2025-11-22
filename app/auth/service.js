@@ -1,22 +1,19 @@
-const path = require('path');
-const fs = require('fs');
-const crypto = require('crypto');
-const { authModel } = require('./model');
+import fs from 'fs';
+import crypto from 'crypto';
+import { authModel } from './model.js';
 
-const loader = require;
 const jwtSecret = 'node-express-ejs';
 const hashKey = 'AS2P8AcBedZ';
 const db = {
-  users: path.resolve(__dirname, '../../db/users.json'),
+  users: 'db/users.json',
 };
 const alg = 'sha512';
 
-class AuthService {
+export class AuthService {
   login(rest) {
     const { login, password } = rest;
     const ts = new Date().toLocaleString();
-    delete loader.cache[db.users];
-    const { users } = loader(db.users);
+    const { users } = JSON.parse(fs.readFileSync(db.users).toString());
     this.refactorUsers(users);
     const plain = `${login}/${password}`;
     const hash = crypto.createHash(alg).update(plain).digest('hex');
@@ -53,7 +50,8 @@ class AuthService {
   }
 }
 
-module.exports = {
+export const authService = new AuthService();
+export default {
   AuthService,
-  authService: new AuthService(),
+  authService,
 };

@@ -1,10 +1,10 @@
-const { Router } = require('express');
-const { authController } = require('./controller');
-const { authValidation } = require('./validation');
+import { Router } from 'express';
+import { authController } from './controller.js';
+import { authValidation } from './validation.js';
 
 const router = Router();
 
-class AuthRoute {
+export class AuthRoute {
   constructor() {
     router.get(
       '/auth',
@@ -27,7 +27,8 @@ class AuthRoute {
   }
 }
 
-module.exports = {
+export const authRoute = new AuthRoute();
+export default {
   AuthRoute,
-  authRoute: new AuthRoute(),
+  authRoute,
 };

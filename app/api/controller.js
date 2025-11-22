@@ -1,7 +1,7 @@
-const { logger } = require('@jobscale/logger');
-const { apiService } = require('./service');
+import { logger } from '@jobscale/logger';
+import { apiService } from './service.js';
 
-class ApiController {
+export class ApiController {
   hostname(req, res) {
     apiService.hostname()
     .then(result => res.json(result))
@@ -24,7 +24,9 @@ class ApiController {
   }
 }
 
-module.exports = {
+export const apiController = new ApiController();
+
+export default {
   ApiController,
-  apiController: new ApiController(),
+  apiController,
 };

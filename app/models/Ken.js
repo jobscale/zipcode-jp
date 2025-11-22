@@ -1,10 +1,9 @@
-const Sequelize = require('sequelize');
-
-const { database } = require('../../config/database');
+import Sequelize from 'sequelize';
+import { database } from '../../config/database.js';
 
 const tableName = 'ken';
 
-module.exports = database.define(tableName, {
+export const Ken = database.define(tableName, {
   jis_code: {
     allowNull: false,
     type: Sequelize.STRING,

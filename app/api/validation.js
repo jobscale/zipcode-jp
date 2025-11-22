@@ -1,6 +1,6 @@
-const Joi = require('joi');
+import Joi from 'joi';
 
-class ApiValidation {
+export class ApiValidation {
   find(req, res, next) {
     const { body } = req;
     const { error } = Joi.object({
@@ -14,7 +14,8 @@ class ApiValidation {
   }
 }
 
-module.exports = {
+export const apiValidation = new ApiValidation();
+export default {
   ApiValidation,
-  apiValidation: new ApiValidation(),
+  apiValidation,
 };

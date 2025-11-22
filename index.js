@@ -1,5 +1,5 @@
-const { logger } = require('@jobscale/logger');
-const { App } = require('./app');
+import { logger } from '@jobscale/logger';
+import { App } from './app/index.js';
 
 const main = () => {
   const prom = {};
@@ -19,6 +19,6 @@ const main = () => {
   return prom.pending;
 };
 
-module.exports = {
+export default {
   server: main(),
 };

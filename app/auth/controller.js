@@ -1,9 +1,9 @@
-const dayjs = require('dayjs');
-const createError = require('http-errors');
-const { logger } = require('@jobscale/logger');
-const { authService } = require('./service');
+import dayjs from 'dayjs';
+import createError from 'http-errors';
+import { logger } from '@jobscale/logger';
+import { authService } from './service.js';
 
-class AuthController {
+export class AuthController {
   index(req, res) {
     const { remoteAddress } = req.socket;
     Promise.resolve(new Date().toISOString())
@@ -56,7 +56,8 @@ class AuthController {
   }
 }
 
-module.exports = {
+export const authController = new AuthController();
+export default {
   AuthController,
-  authController: new AuthController(),
+  authController,
 };

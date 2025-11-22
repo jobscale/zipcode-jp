@@ -1,14 +1,14 @@
-const os = require('os');
-const path = require('path');
-const createError = require('http-errors');
-const express = require('express');
-const cookieParser = require('cookie-parser');
-const { logger } = require('@jobscale/logger');
-const { route } = require('./route');
+import os from 'os';
+import path from 'path';
+import createError from 'http-errors';
+import express from 'express';
+import cookieParser from 'cookie-parser';
+import { logger } from '@jobscale/logger';
+import { route } from './route.js';
 
 const app = express();
 
-class App {
+export class App {
   useParser() {
     app.use(express.static(path.join(process.cwd(), 'docs')));
     app.use(express.json());
@@ -94,6 +94,6 @@ class App {
   }
 }
 
-module.exports = {
+export default {
   App,
 };

@@ -1,8 +1,6 @@
-const path = require('path');
+import path from 'path';
 
-module.exports = {
-  connection: {
-    dialect: 'sqlite',
-    storage: path.join(process.cwd(), 'db', 'database.sqlite'),
-  },
+export const connection = {
+  dialect: 'sqlite',
+  storage: path.join(process.cwd(), 'db', 'database.sqlite'),
 };

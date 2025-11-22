@@ -1,8 +1,8 @@
-const os = require('os');
-const { Op } = require('sequelize');
-const Ken = require('../models/Ken');
+import os from 'os';
+import { Op } from 'sequelize';
+import { Ken } from '../models/Ken.js';
 
-class ApiService {
+export class ApiService {
   async hostname() {
     return {
       hostname: os.hostname(),
@@ -33,7 +33,9 @@ class ApiService {
   }
 }
 
-module.exports = {
+export const apiService = new ApiService();
+
+export default {
   ApiService,
-  apiService: new ApiService(),
+  apiService,
 };
