@@ -1,7 +1,7 @@
-const fs = require('fs');
-const awsServerlessExpress = require('aws-serverless-express');
-const logger = require('@jobscale/logger');
-const { server: application } = require('.');
+import fs from 'fs';
+import awsServerlessExpress from 'aws-serverless-express';
+import logger from '@jobscale/logger';
+import { server as application } from './index.js';
 
 const distribution = () => {
   const env = Buffer.from(fs.readFileSync('/etc/os-release')).toString();

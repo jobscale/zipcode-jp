@@ -19,6 +19,5 @@ const main = () => {
   return prom.pending;
 };
 
-export default {
-  server: main(),
-};
+export const server = main();
+export default { server };
