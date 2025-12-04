@@ -5,7 +5,8 @@ import { open } from 'sqlite';
 import iconv from 'iconv-lite';
 import { logger } from '@jobscale/logger';
 import { describe, jest } from '@jest/globals';
-import { service } from '../app/api/service.js';
+import request from 'supertest';
+import { app } from '../app/index.js';
 
 const filename = 'db/database.sqlite';
 
@@ -110,10 +111,10 @@ describe('initialize and test', () => {
         );
 
         try {
-          const result = await service.hostname();
-          expect(result).toHaveProperty('hostname');
-          expect(result).toHaveProperty('ip');
-          expect(result.ip).toBe('127.0.0.1');
+          const { body } = await request(app).post('/api/hostname');
+          expect(body).toHaveProperty('hostname');
+          expect(body).toHaveProperty('ip');
+          expect(body.ip).toBe('127.0.0.1');
         } finally {
           global.fetch = originalFetch;
         }
@@ -122,7 +123,9 @@ describe('initialize and test', () => {
 
     describe('true test', () => {
       it('service.find Tokyo', async () => {
-        const rows = await service.find({ code: '1000001' });
+        const { body: rows } = await request(app)
+        .post('/api/find')
+        .send({ code: '1000001' });
         logger.info(JSON.stringify({ length: rows.length, rows }));
         expect(rows).toHaveLength(1);
         expect(rows[0].code).toBe('1000001');
@@ -132,7 +135,9 @@ describe('initialize and test', () => {
       });
 
       it('service.find Hokkaido', async () => {
-        const rows = await service.find({ code: '00100' });
+        const { body: rows } = await request(app)
+        .post('/api/find')
+        .send({ code: '00100' });
         logger.info(JSON.stringify({ length: rows.length, rows }));
         expect(rows).toHaveLength(32);
         expect(rows[0].pref).toBe('北海道');
@@ -141,7 +146,9 @@ describe('initialize and test', () => {
       });
 
       it('service.find Okinawa', async () => {
-        const rows = await service.find({ code: '90000' });
+        const { body: rows } = await request(app)
+        .post('/api/find')
+        .send({ code: '90000' });
         logger.info(JSON.stringify({ length: rows.length, rows }));
         expect(rows).toHaveLength(28);
         expect(rows[0].code).toBe('9000001');
@@ -151,7 +158,9 @@ describe('initialize and test', () => {
       });
 
       it('service.find Mie', async () => {
-        const rows = await service.find({ code: '510000' });
+        const { body: rows } = await request(app)
+        .post('/api/find')
+        .send({ code: '510000' });
         logger.info(JSON.stringify({ length: rows.length, rows }));
         expect(rows).toHaveLength(8);
         expect(rows[0].code).toBe('5100001');
@@ -161,7 +170,9 @@ describe('initialize and test', () => {
       });
 
       it('service.find Osaka', async () => {
-        const rows = await service.find({ code: '532000' });
+        const { body: rows } = await request(app)
+        .post('/api/find')
+        .send({ code: '532000' });
         logger.info(JSON.stringify({ length: rows.length, rows }));
         expect(rows).toHaveLength(6);
         expect(rows[0].code).toBe('5320001');
@@ -171,7 +182,9 @@ describe('initialize and test', () => {
       });
 
       it('service.find Kyoto', async () => {
-        const rows = await service.find({ code: '611000' });
+        const { body: rows } = await request(app)
+        .post('/api/find')
+        .send({ code: '611000' });
         logger.info(JSON.stringify({ length: rows.length, rows }));
         expect(rows).toHaveLength(3);
         expect(rows[0].code).toBe('6110001');
@@ -183,12 +196,16 @@ describe('initialize and test', () => {
 
     describe('can not find all test', () => {
       it('service.find with short code', async () => {
-        const result = await service.find({ code: '12' });
+        const { body: result } = await request(app)
+        .post('/api/find')
+        .send({ code: '12' });
         expect(result).toEqual([]);
       });
 
       it('service.find with non-existent code', async () => {
-        const result = await service.find({ code: '9999999' });
+        const { body: result } = await request(app)
+        .post('/api/find')
+        .send({ code: '9999999' });
         expect(result).toEqual([]);
       });
     });
