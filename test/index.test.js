@@ -13,7 +13,7 @@ const filename = 'db/database.sqlite';
 describe('initialize and test', () => {
   describe('setup database phase', () => {
     let db;
-    beforeAll(async () => {
+    beforeEach(async () => {
       await fs.promises.mkdir('db', { recursive: true });
       const isExists = fs.existsSync(filename);
       db = await open({
@@ -68,9 +68,9 @@ describe('initialize and test', () => {
       }
       await stmt.finalize();
       await db.exec('COMMIT');
-    });
+    }, 15000);
 
-    afterAll(async () => {
+    afterEach(async () => {
       await db.close();
       logger.info('finished');
     });

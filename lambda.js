@@ -1,10 +1,9 @@
 import fs from 'fs';
-import awsServerlessExpress from 'aws-serverless-express';
 import logger from '@jobscale/logger';
 import { server as application } from './index.js';
 
 const distribution = () => {
-  const env = Buffer.from(fs.readFileSync('/etc/os-release')).toString();
+  const env = fs.readFileSync('/etc/os-release', 'utf-8');
   logger.info({ env });
   return env;
 };
@@ -14,11 +13,8 @@ exports.handler = async event => {
 
   distribution();
 
-  return application
-  .then(app => awsServerlessExpress.createServer(app))
-  .then(server => new Promise((succeed, error) => {
-    awsServerlessExpress.proxy(server, event, { succeed, error });
-  }))
+  const { body } = event;
+  return application({ body }, {})
   .catch(e => logger.error(e) || {
     statusCode: 503,
     headers: { 'Content-Length': 'application/json' },
