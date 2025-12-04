@@ -1,9 +1,9 @@
 import { logger } from '@jobscale/logger';
-import { apiService } from './service.js';
+import { service } from './service.js';
 
-export class ApiController {
+export class Controller {
   hostname(req, res) {
-    apiService.hostname()
+    return service.hostname()
     .then(result => res.json(result))
     .catch(e => {
       logger.info({ message: e.message });
@@ -14,7 +14,7 @@ export class ApiController {
 
   find(req, res) {
     const { code } = req.body;
-    apiService.find({ code })
+    return service.find({ code })
     .then(result => res.json(result))
     .catch(e => {
       logger.info({ message: e.message });
@@ -24,9 +24,5 @@ export class ApiController {
   }
 }
 
-export const apiController = new ApiController();
-
-export default {
-  ApiController,
-  apiController,
-};
+export const controller = new Controller();
+export default { Controller, controller };

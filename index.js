@@ -1,23 +1,25 @@
+import http from 'http';
+import './app/config/index.js';
 import { logger } from '@jobscale/logger';
-import { App } from './app/index.js';
+import { app, errorHandler } from './app/index.js';
 
-const main = () => {
-  const prom = {};
-  prom.pending = new Promise(resolve => { prom.resolve = resolve; });
-  const app = new App().start();
+const PORT = Number.parseInt(process.env.PORT || 3000, 10);
+
+const main = async () => {
+  const server = http.createServer(app);
+  server.on('error', errorHandler);
   const options = {
     host: '0.0.0.0',
-    port: process.env.PORT || 3000,
+    port: PORT,
   };
-  app.listen(options, () => {
+  server.listen(options, () => {
     logger.info(JSON.stringify({
       Server: 'Started',
       'Listen on': `http://127.0.0.1:${options.port}`,
     }, null, 2));
-    prom.resolve(app);
   });
-  return prom.pending;
+  return app;
 };
 
-export const server = main();
-export default { server };
+export const server = await main();
+export default server;

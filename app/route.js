@@ -1,25 +1,9 @@
-import { Router } from 'express';
-import { apiRoute } from './api/route.js';
-import { authRoute } from './auth/route.js';
+import { Router } from './router.js';
+import { route as apiRoute } from './api/route.js';
 
-const router = Router();
+const router = new Router();
+router.use('', apiRoute.router);
+router.use('/api', apiRoute.router);
 
-export class Route {
-  constructor() {
-    router.use(
-      '/api',
-      (...args) => apiRoute.router(...args),
-    );
-    router.use(
-      '',
-      (...args) => authRoute.router(...args),
-    );
-    this.router = router;
-  }
-}
-
-export const route = new Route();
-export default {
-  Route,
-  route,
-};
+export const route = { router };
+export default { route };

@@ -1,27 +1,14 @@
-import { Router } from 'express';
-import { apiController } from './controller.js';
-import { apiValidation } from './validation.js';
+import { Router } from '../router.js';
+import { controller } from './controller.js';
+import { validation } from './validation.js';
 
-const router = Router();
+const router = new Router();
+router.add('POST', '/hostname', controller.hostname);
+router.add('POST', '/find', async (req, res) => {
+  await validation.find(req, res, controller.find);
+});
 
-export class ApiRoute {
-  constructor() {
-    router.post(
-      '/hostname',
-      (...args) => apiController.hostname(...args),
-    );
-    router.post(
-      '/find',
-      (...args) => apiValidation.find(...args),
-      (...args) => apiController.find(...args),
-    );
-    this.router = router;
-  }
-}
-
-export const apiRoute = new ApiRoute();
-
+export const route = { router };
 export default {
-  ApiRoute,
-  apiRoute,
+  route: { router },
 };

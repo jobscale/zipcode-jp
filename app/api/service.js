@@ -2,7 +2,7 @@ import os from 'os';
 import { Op } from 'sequelize';
 import { Ken } from '../models/Ken.js';
 
-export class ApiService {
+export class Service {
   async hostname() {
     return {
       hostname: os.hostname(),
@@ -33,9 +33,5 @@ export class ApiService {
   }
 }
 
-export const apiService = new ApiService();
-
-export default {
-  ApiService,
-  apiService,
-};
+export const service = new Service();
+export default { Service, service };

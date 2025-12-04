@@ -1,99 +1,198 @@
 import os from 'os';
 import path from 'path';
-import createError from 'http-errors';
-import express from 'express';
-import cookieParser from 'cookie-parser';
+import fs from 'fs';
+import mime from 'mime';
+import createHttpError from 'http-errors';
 import { logger } from '@jobscale/logger';
+import { parseCookies } from './parse-cookie.js';
 import { route } from './route.js';
+import { parseBody } from './parse-body.js';
 
-const app = express();
+const { XDG_SESSION_DESKTOP } = process.env;
 
-export class App {
-  useParser() {
-    app.use(express.static(path.join(process.cwd(), 'docs')));
-    app.use(express.json());
-    app.use(express.urlencoded({ extended: false }));
-    app.use(cookieParser());
+const formatTimestamp = (ts = Date.now()) => new Intl.DateTimeFormat('sv-SE', {
+  timeZone: 'Asia/Tokyo',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+}).format(new Date(ts));
+
+export class Ingress {
+  useHeader(req, res) {
+    const headers = new Headers(req.headers);
+    const protocol = req.socket.encrypted ? 'https' : 'http';
+    const host = headers.get('host');
+    const origin = headers.get('origin') || `${protocol}://${host}`;
+    res.setHeader('ETag', 'false');
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, HEAD');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Server', 'acl-ingress-k8s');
+    res.setHeader('X-Backend-Host', os.hostname());
+    if (req.method === 'GET') {
+      res.setHeader('Link', '</icon/cat-hand-mini.svg>; rel="icon"; type="image/svg+xml"');
+    }
+    const csp = [
+      "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https: wss:",
+      "base-uri 'none'",
+    ];
+    if (!['plasma', 'cinnamon'].includes(XDG_SESSION_DESKTOP)) {
+      res.setHeader('Content-Security-Policy', csp.join('; '));
+    } else {
+      res.setHeader('Content-Security-Policy', csp.map(v => v.replace('https:', 'http:')).map(v => v.replace('wss:', 'ws:')).join('; '));
+    }
+    res.setHeader('Permissions-Policy', 'accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubdomains; preload');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
   }
 
-  useHeader() {
-    app.set('etag', false);
-    app.set('x-powered-by', false);
-    app.use((req, res, next) => {
-      const origin = req.headers.origin || `${req.protocol}://${req.headers.host}`;
-      res.header('Access-Control-Allow-Origin', `${origin}`);
-      res.header('Access-Control-Allow-Methods', 'GET, POST, HEAD');
-      res.header('Access-Control-Allow-Headers', 'Content-Type');
-      res.header('Server', 'acl-ingress-k8s');
-      res.header('X-Backend-Host', os.hostname());
-      next();
+  usePublic(req, res) {
+    if (!['GET', 'HEAD'].includes(req.method)) return false;
+    const headers = new Headers(req.headers);
+    const { url } = req;
+    const protocol = req.socket.encrypted ? 'https' : 'http';
+    const host = headers.get('host');
+    const { pathname } = new URL(`${protocol}://${host}${url}`);
+    const baseDir = path.join(process.cwd(), 'docs');
+    const file = {
+      path: path.join(baseDir, pathname),
+    };
+    if (!file.path.startsWith(baseDir)) return false;
+    file.stat = fs.existsSync(file.path) && fs.statSync(file.path);
+    if (!file.stat) return false;
+    if (file.stat.isDirectory()) {
+      if (!file.path.endsWith('/')) {
+        res.writeHead(307, { Location: `${url}/` });
+        res.end();
+        return true;
+      }
+      file.path += 'index.html';
+      file.stat = fs.existsSync(file.path) && fs.statSync(file.path);
+      if (!file.stat) return false;
+    }
+    const contentType = mime.getType(file.path) || 'application/octet-stream';
+    const contentLength = file.stat.size;
+    const stream = fs.createReadStream(file.path);
+    res.writeHead(200, {
+      'Content-Type': contentType,
+      'Content-Length': contentLength,
     });
+    if (req.method === 'HEAD') {
+      res.end();
+      return true;
+    }
+    stream.pipe(res);
+    return true;
   }
 
-  useLogging() {
-    app.use((req, res, next) => {
-      const ts = new Date().toLocaleString();
-      const progress = () => {
-        const remoteIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-        const { protocol, method, url } = req;
-        const headers = JSON.stringify(req.headers);
-        logger.info({
-          ts, remoteIp, protocol, method, url, headers,
-        });
-      };
-      progress();
-      res.on('finish', () => {
-        const { statusCode, statusMessage } = res;
-        const headers = JSON.stringify(res.getHeaders());
-        logger.info({
-          ts, statusCode, statusMessage, headers,
-        });
+  useLogging(req, res) {
+    const ts = formatTimestamp();
+    const progress = () => {
+      const headers = new Headers(req.headers);
+      const ip = req.socket.remoteAddress || req.ip;
+      const remoteIp = headers.get('X-Real-Ip') || headers.get('X-Forwarded-For') || ip;
+      const { method, url } = req;
+      const protocol = req.socket.encrypted ? 'https' : 'http';
+      const host = headers.get('host');
+      logger.info({
+        ts,
+        req: JSON.stringify({
+          remoteIp, protocol, host, method, url,
+        }),
+        headers: JSON.stringify(Object.fromEntries(headers.entries())),
       });
-      next();
+    };
+    progress();
+    res.on('finish', () => {
+      const { statusCode, statusMessage } = res;
+      const headers = JSON.stringify(res.getHeaders());
+      logger.info({
+        ts, statusCode, statusMessage, headers,
+      });
     });
   }
 
-  useRoute() {
-    app.use('', route.router);
+  async useRoute(req, res) {
+    const headers = new Headers(req.headers);
+    const method = req.method.toUpperCase();
+    const protocol = req.socket.encrypted ? 'https' : 'http';
+    const host = headers.get('host');
+    const { pathname, searchParams } = new URL(`${protocol}://${host}${req.url}`);
+    const pathRoute = `${method} ${pathname}`;
+    logger.debug({ pathRoute, searchParams });
+
+    res.contentType = contentType => {
+      res.setHeader('Content-Type', contentType);
+    };
+    res.status = code => {
+      res.statusCode = code;
+      return res;
+    };
+    res.json = any => {
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify(any));
+    };
+    res.redirect = uri => {
+      res.writeHead(307, { Location: uri });
+      res.end();
+    };
+
+    parseCookies(req, res);
+    await parseBody(req);
+    await route.router.handle(req, res);
+
+    if (res.writableEnded) return;
+    this.notfoundHandler(req, res);
   }
 
-  notfoundHandler() {
-    app.use((req, res) => {
-      if (req.method === 'GET') {
-        const e = createError(404);
-        res.locals.e = e;
-        res.status(e.status).send(e.message);
-        return;
-      }
-      const e = createError(501);
-      res.status(e.status).json({ message: e.message });
-    });
+  notfoundHandler(req, res) {
+    if (req.method === 'GET') {
+      const e = createHttpError(404);
+      res.writeHead(e.status, { 'Content-Type': 'text/plain' });
+      res.end(e.message);
+      return;
+    }
+    const e = createHttpError(501);
+    res.writeHead(e.status, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ message: e.message }));
   }
 
-  errorHandler() {
-    app.use((e, req, res, done) => {
-      (never => never)(done);
-      if (!e.status) e.status = 503;
-      if (req.method === 'GET') {
-        res.locals.e = e;
-        res.status(e.status).send(e.message);
-        return;
-      }
-      res.status(e.status).json({ message: e.message });
-    });
+  errorHandler(e, req, res) {
+    logger.error(e);
+    if (!res) return;
+    if (req.method === 'GET') {
+      e = createHttpError(503);
+      res.writeHead(e.status, { 'Content-Type': 'text/plain' });
+      res.end(e.message);
+      return;
+    }
+    if (!e.status) e = createHttpError(500);
+    res.writeHead(e.status, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ message: e.message }));
   }
 
   start() {
-    this.useParser();
-    this.useHeader();
-    this.useLogging();
-    this.useRoute();
-    this.notfoundHandler();
-    this.errorHandler();
-    return app;
+    return async (req, res) => {
+      try {
+        this.useHeader(req, res);
+        if (this.usePublic(req, res)) return;
+        this.useLogging(req, res);
+        await this.useRoute(req, res);
+      } catch (e) {
+        this.errorHandler(e, req, res);
+      }
+    };
   }
 }
 
-export default {
-  App,
-};
+const ingress = new Ingress();
+export const app = ingress.start();
+const { upgradeHandler, errorHandler } = ingress;
+export { upgradeHandler, errorHandler };
+export default app;

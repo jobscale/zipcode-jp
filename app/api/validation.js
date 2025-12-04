@@ -1,7 +1,7 @@
 import Joi from 'joi';
 
-export class ApiValidation {
-  find(req, res, next) {
+export class Validation {
+  async find(req, res, next) {
     const { body } = req;
     const { error } = Joi.object({
       code: Joi.string().required().min(3).max(7),
@@ -10,12 +10,9 @@ export class ApiValidation {
       res.status(200).json([]);
       return;
     }
-    next();
+    await next(req, res);
   }
 }
 
-export const apiValidation = new ApiValidation();
-export default {
-  ApiValidation,
-  apiValidation,
-};
+export const validation = new Validation();
+export default { Validation, validation };
