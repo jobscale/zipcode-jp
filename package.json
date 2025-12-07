@@ -1,7 +1,7 @@
 {
   "name": "zipcode-jp",
   "private": true,
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "node express ejs template SSR MVC",
   "author": "jobscale <jobscale@users.noreply.github.com>",
   "repository": {
