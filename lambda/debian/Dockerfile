@@ -29,8 +29,9 @@ WORKDIR ${FUNCTION_DIR}
 
 COPY --chown=node:staff create.sql .
 RUN mkdir db && sqlite3 db/database.sqlite < create.sql
-RUN curl -sL -O https://www.post.japanpost.jp/zipcode/dl/kogaki/zip/ken_all.zip \
- && zcat ken_all.zip | iconv -f sjis -t utf8 | sqlite3 -separator , db/database.sqlite ".import /dev/stdin ken"
+RUN curl -sL -O https://www.post.japanpost.jp/service/search/zipcode/download/utf/zip/utf_ken_all.zip \
+ && zcat utf_ken_all.zip | sqlite3 -separator , db/database.sqlite ".import /dev/stdin ken" \
+ && rm utf_ken_all.zip
 RUN sqlite3 db/database.sqlite "SELECT * FROM ken WHERE postal_code7 like '534002%' limit 2 offset 2"
 
 COPY --from=build-image ${FUNCTION_DIR} .
