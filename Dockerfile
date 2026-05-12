@@ -1,21 +1,3 @@
-FROM node:lts-trixie-slim AS test
-SHELL ["bash", "-c"]
-WORKDIR /home/node
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y --no-install-recommends \
-  ca-certificates curl vim \
- && apt-get clean && rm -fr /var/lib/apt/lists/*
-COPY --chown=node:staff package.json .
-RUN npm i
-COPY --chown=node:staff eslint.config.js .
-COPY --chown=node:staff create.sql .
-COPY --chown=node:staff index.js .
-COPY --chown=node:staff app app
-COPY --chown=node:staff docs docs
-COPY --chown=node:staff config config
-COPY --chown=node:staff test test
-RUN npm test
-
 FROM node:lts-trixie-slim
 SHELL ["bash", "-c"]
 WORKDIR /home/node
@@ -36,8 +18,8 @@ USER node
 RUN npm version | xargs
 COPY --chown=node:staff create.sql .
 RUN mkdir db && sqlite3 db/database.sqlite < create.sql
-RUN curl -sL -O https://www.post.japanpost.jp/zipcode/dl/kogaki/zip/ken_all.zip \
- && zcat ken_all.zip | iconv -f sjis -t utf8 | sqlite3 -separator , db/database.sqlite ".import /dev/stdin ken"
+RUN curl -sL -O https://www.post.japanpost.jp/service/search/zipcode/download/utf/zip/utf_ken_all.zip \
+ && zcat utf_ken_all.zip | sqlite3 -separator , db/database.sqlite ".import /dev/stdin ken"
 RUN sqlite3 db/database.sqlite "SELECT * FROM ken WHERE postal_code7 like '534002%' limit 2 offset 2"
 
 COPY --chown=node:staff package.json .
