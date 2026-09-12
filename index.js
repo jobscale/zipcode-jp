@@ -1,25 +1,21 @@
 import http from 'http';
-import './app/config/index.js';
 import { logger } from '@jobscale/create-logger';
 import { app, errorHandler } from './app/index.js';
 
 const PORT = Number.parseInt(process.env.PORT || 3000, 10);
 
-const main = async () => {
-  const server = http.createServer(app);
+const httpServer = (port, bind = '127.0.0.1') => {
+  const server = http.createServer();
+  server.on('connection', socket => socket.on('error', logger.error));
+  server.on('request', app);
   server.on('error', errorHandler);
-  const options = {
-    host: '0.0.0.0',
-    port: PORT,
-  };
-  server.listen(options, () => {
+  server.listen(port, bind, () => {
     logger.info(JSON.stringify({
       Server: 'Started',
-      'Listen on': `http://127.0.0.1:${options.port}`,
+      'Listen on': `http://127.0.0.1:${port}`,
     }, null, 2));
   });
   return app;
 };
 
-export const server = await main();
-export default server;
+export default httpServer(PORT, '0.0.0.0');
