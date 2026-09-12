@@ -4,7 +4,6 @@ SHELL ["bash", "-c"]
 RUN yum install -y git curl unzip sqlite3 locales
 
 COPY package.json package.json
-RUN npm i aws-serverless-express
 RUN npm i --omit=dev
 
 COPY create.sql .

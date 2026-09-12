@@ -1,6 +1,6 @@
 ARG FUNCTION_DIR="/var/task"
 
-FROM node:lts-bookworm AS build-image
+FROM node:lts-trixie AS build-image
 SHELL ["bash", "-c"]
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -12,10 +12,10 @@ ARG FUNCTION_DIR
 WORKDIR ${FUNCTION_DIR}
 
 COPY package.json package.json
-RUN npm i aws-lambda-ric
-RUN npm i aws-serverless-express && npm i --omit=dev
+RUN npm config set fetch-timeout 300000 && npm i aws-lambda-ric \
+ && npm i --omit=dev
 
-FROM node:lts-bookworm-slim
+FROM node:lts-trixie-slim
 SHELL ["bash", "-c"]
 
 ENV DEBIAN_FRONTEND=noninteractive
