@@ -12,7 +12,7 @@ if (!config) {
 }
 
 const repositoryName = 'zipcode-jp';
-const tagName = 'lambda-debian-9';
+const tagName = 'lambda-debian-16';
 
 const { region } = config;
 const accountId = execFileSync(

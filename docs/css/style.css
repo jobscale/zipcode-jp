@@ -41,6 +41,13 @@ button {
   cursor: pointer;
 }
 
+.button svg {
+  width: 1.2em;
+}
+.button:has(> svg) {
+  border: none;
+}
+
 .page-title {
   font-size: 2em;
   margin-bottom: 1em;
