@@ -1,49 +1,70 @@
+import './config/index.js';
 import os from 'os';
 import path from 'path';
 import fs from 'fs';
+import crypto from 'crypto';
 import mime from 'mime';
+import { logger } from '@jobscale/create-logger';
 import createHttpError from 'http-errors';
-import { logger } from '@jobscale/logger';
 import { parseCookies } from './parse-cookie.js';
 import { route } from './route.js';
 import { parseBody } from './parse-body.js';
 
-const { XDG_SESSION_DESKTOP } = process.env;
+const { ENV } = process.env;
 
-const formatTimestamp = (ts = Date.now()) => new Intl.DateTimeFormat('sv-SE', {
-  timeZone: 'Asia/Tokyo',
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-  hour: '2-digit',
-  minute: '2-digit',
-  second: '2-digit',
-}).format(new Date(ts));
+const allowMethods = ['GET', 'HEAD', 'POST'];
+const allowHeaders = ['Content-Type'];
+
+const formatTimestamp = (ts = Date.now(), withoutTimezone = false) => {
+  const timestamp = new Intl.DateTimeFormat('sv-SE', {
+    timeZone: 'Asia/Tokyo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).format(new Date(ts));
+  if (withoutTimezone) return timestamp;
+  return `${timestamp}+09:00`;
+};
 
 export class Ingress {
+  constructor(opts = {}) {
+    this.opts = { public: true, logging: true, ...opts };
+  }
+
   useHeader(req, res) {
-    const headers = new Headers(req.headers);
-    const protocol = req.socket.encrypted ? 'https' : 'http';
-    const host = headers.get('host');
-    const origin = headers.get('origin') || `${protocol}://${host}`;
+    const { protocol } = req.ensure.url;
     res.setHeader('ETag', 'false');
-    res.setHeader('Access-Control-Allow-Origin', origin);
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, HEAD');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    res.setHeader('Server', 'acl-ingress-k8s');
+    if (!res.hasHeader('Server')) res.setHeader('Server', 'acl-ingress-eco-system');
+    res.setHeader('X-Env', ENV);
+    res.setHeader('X-Host', req.headers.get('Host'));
+    res.setHeader('X-Origin', req.headers.get('Origin'));
     res.setHeader('X-Backend-Host', os.hostname());
     if (req.method === 'GET') {
-      res.setHeader('Link', '</icon/cat-hand-mini.svg>; rel="icon"; type="image/svg+xml"');
+      res.setHeader('Link', '</icon/cat-hand.svg>; rel="icon"; type="image/svg+xml"');
     }
+    const inlinePolicy = `nonce-${crypto.randomBytes(7).toString('hex')}`;
+    const scheme = protocol === 'http' ? 'http: ws:' : 'https: wss:';
+    const allowCdn = [
+      'https://cdn.jsdelivr.net',
+      'https://esm.sh',
+      'https://cdnjs.cloudflare.com',
+    ].join(' ');
     const csp = [
-      "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https: wss:",
+      "default-src 'self'",
+      `script-src 'self' 'unsafe-eval' '${inlinePolicy}' ${allowCdn}`,
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "font-src 'self' data: https://fonts.gstatic.com",
+      "img-src 'self' data:",
+      "media-src 'self' data:",
+      `connect-src 'self' ${scheme}`,
+      "object-src 'none'",
       "base-uri 'none'",
+      "frame-ancestors 'self'",
     ];
-    if (!['plasma', 'cinnamon'].includes(XDG_SESSION_DESKTOP)) {
-      res.setHeader('Content-Security-Policy', csp.join('; '));
-    } else {
-      res.setHeader('Content-Security-Policy', csp.map(v => v.replace('https:', 'http:')).map(v => v.replace('wss:', 'ws:')).join('; '));
-    }
+    res.setHeader('Content-Security-Policy', csp.join('; '));
     res.setHeader('Permissions-Policy', 'accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubdomains; preload');
@@ -54,12 +75,8 @@ export class Ingress {
 
   usePublic(req, res) {
     if (!['GET', 'HEAD'].includes(req.method)) return false;
-    const headers = new Headers(req.headers);
-    const { url } = req;
-    const protocol = req.socket.encrypted ? 'https' : 'http';
-    const host = headers.get('host');
-    const { pathname } = new URL(`${protocol}://${host}${url}`);
-    const baseDir = path.join(process.cwd(), 'docs');
+    const { pathname, search } = req.ensure.url;
+    const baseDir = path.join(process.cwd(), 'cdk-app/lib/functions/proxy/docs');
     const file = {
       path: path.join(baseDir, pathname),
     };
@@ -68,7 +85,7 @@ export class Ingress {
     if (!file.stat) return false;
     if (file.stat.isDirectory()) {
       if (!file.path.endsWith('/')) {
-        res.writeHead(307, { Location: `${url}/` });
+        res.writeHead(307, { Location: `${pathname}/${search}` });
         res.end();
         return true;
       }
@@ -76,7 +93,7 @@ export class Ingress {
       file.stat = fs.existsSync(file.path) && fs.statSync(file.path);
       if (!file.stat) return false;
     }
-    const contentType = mime.getType(file.path) || 'application/octet-stream';
+    const contentType = mime.getType(file.path) ?? 'application/octet-stream';
     const contentLength = file.stat.size;
     const stream = fs.createReadStream(file.path);
     res.writeHead(200, {
@@ -92,57 +109,29 @@ export class Ingress {
   }
 
   useLogging(req, res) {
-    const ts = formatTimestamp();
+    const { protocol } = req.ensure.url;
+    const globalIp = req.headers.get('X-Forwarded-For')?.split(/[, ]/)[0] || req.socket.remoteAddress;
+    const start = Date.now();
     const progress = () => {
-      const headers = new Headers(req.headers);
-      const ip = req.socket.remoteAddress || req.ip;
-      const remoteIp = headers.get('X-Real-Ip') || headers.get('X-Forwarded-For') || ip;
       const { method, url } = req;
-      const protocol = req.socket.encrypted ? 'https' : 'http';
-      const host = headers.get('host');
-      logger.info({
-        ts,
-        req: JSON.stringify({
-          remoteIp, protocol, host, method, url,
-        }),
-        headers: JSON.stringify(Object.fromEntries(headers.entries())),
-      });
+      logger.info(JSON.stringify({
+        ts: formatTimestamp(),
+        globalIp, protocol, method, url,
+        headers: Object.fromEntries(req.headers.entries()),
+      }));
     };
     progress();
     res.on('finish', () => {
-      const { statusCode, statusMessage } = res;
-      const headers = JSON.stringify(res.getHeaders());
-      logger.info({
-        ts, statusCode, statusMessage, headers,
-      });
+      logger.info(JSON.stringify({
+        ts: formatTimestamp(),
+        statusCode: res.statusCode,
+        headers: res.getHeaders(),
+        duration: Date.now() - start,
+      }));
     });
   }
 
   async useRoute(req, res) {
-    const headers = new Headers(req.headers);
-    const method = req.method.toUpperCase();
-    const protocol = req.socket.encrypted ? 'https' : 'http';
-    const host = headers.get('host');
-    const { pathname, searchParams } = new URL(`${protocol}://${host}${req.url}`);
-    const pathRoute = `${method} ${pathname}`;
-    logger.debug({ pathRoute, searchParams });
-
-    res.contentType = contentType => {
-      res.setHeader('Content-Type', contentType);
-    };
-    res.status = code => {
-      res.statusCode = code;
-      return res;
-    };
-    res.json = any => {
-      res.setHeader('Content-Type', 'application/json');
-      res.end(JSON.stringify(any));
-    };
-    res.redirect = uri => {
-      res.writeHead(307, { Location: uri });
-      res.end();
-    };
-
     parseCookies(req, res);
     await parseBody(req);
     await route.router.handle(req, res);
@@ -154,45 +143,82 @@ export class Ingress {
   notfoundHandler(req, res) {
     if (req.method === 'GET') {
       const e = createHttpError(404);
-      res.writeHead(e.status, { 'Content-Type': 'text/plain' });
+      res.writeHead(e.status, { 'Content-Type': 'text/plain; charset=utf-8' });
       res.end(e.message);
       return;
     }
     const e = createHttpError(501);
-    res.writeHead(e.status, { 'Content-Type': 'application/json' });
+    res.writeHead(e.status, { 'Content-Type': 'application/json; charset=utf-8' });
     res.end(JSON.stringify({ message: e.message }));
   }
 
   errorHandler(e, req, res) {
     logger.error(e);
-    if (!res) return;
     if (req.method === 'GET') {
       e = createHttpError(503);
-      res.writeHead(e.status, { 'Content-Type': 'text/plain' });
+      res.writeHead(e.status, { 'Content-Type': 'text/plain; charset=utf-8' });
       res.end(e.message);
       return;
     }
     if (!e.status) e = createHttpError(500);
-    res.writeHead(e.status, { 'Content-Type': 'application/json' });
+    res.writeHead(e.status, { 'Content-Type': 'application/json; charset=utf-8' });
     res.end(JSON.stringify({ message: e.message }));
   }
 
   start() {
-    return async (req, res) => {
-      try {
-        this.useHeader(req, res);
-        if (this.usePublic(req, res)) return;
-        this.useLogging(req, res);
-        await this.useRoute(req, res);
-      } catch (e) {
-        this.errorHandler(e, req, res);
+    return async (req, res) => Promise.resolve().then(async () => {
+      if (![...allowMethods, 'OPTIONS'].includes(req.method)) {
+        const e = createHttpError(405);
+        res.setHeader('Allow', allowMethods.join(', '));
+        res.writeHead(e.status, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ message: e.message }));
+        return;
       }
-    };
+
+      if (!(req.headers instanceof Headers)) req.headers = new Headers(req.headers);
+      const [protocol] = req.headers.get('X-Forwarded-Proto')?.split(/, /) ?? [req.socket.encrypted ? 'https' : 'http'];
+      Object.assign(req, {
+        ensure: {
+          url: new URL(`${protocol}://${req.headers.get('Host')}${req.url}`),
+        },
+      });
+
+      const origin = req.headers.get('Origin') ?? `${protocol}://${req.headers.get('Host')}`;
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Methods', allowMethods.join(', '));
+      res.setHeader('Access-Control-Allow-Headers', allowHeaders.join(', '));
+      if (req.method === 'OPTIONS') {
+        res.end('');
+        return;
+      }
+
+      Object.assign(res, {
+        status(code) {
+          res.statusCode = code;
+          return res;
+        },
+        json(value) {
+          res.setHeader('Content-Type', 'application/json; charset=utf-8');
+          res.end(JSON.stringify(value));
+        },
+        redirect(uri) {
+          res.writeHead(307, { Location: uri });
+          res.end();
+        },
+      });
+
+      this.useHeader(req, res);
+      if (this.opts.public && this.usePublic(req, res)) return;
+      if (this.opts.logging) this.useLogging(req, res);
+      await this.useRoute(req, res);
+    }).catch(e => {
+      this.errorHandler(e, req, res);
+    });
   }
 }
 
 const ingress = new Ingress();
 export const app = ingress.start();
-const { upgradeHandler, errorHandler } = ingress;
-export { upgradeHandler, errorHandler };
+const { errorHandler } = ingress;
+export { errorHandler };
 export default app;

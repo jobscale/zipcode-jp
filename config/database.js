@@ -1,5 +1,5 @@
 import Sequelize from 'sequelize';
-import { logger } from '@jobscale/logger';
+import { logger } from '@jobscale/create-logger';
 import { connection } from './connection.js';
 
 const benchmark = true;

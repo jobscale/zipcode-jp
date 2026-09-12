@@ -1,16 +1,14 @@
 import Joi from 'joi';
 
 export class Validation {
-  async find(req, res, next) {
+  find(req, res) {
     const { body } = req;
     const { error } = Joi.object({
       code: Joi.string().required().min(3).max(7),
     }).validate(body);
     if (error) {
       res.status(200).json([]);
-      return;
     }
-    await next(req, res);
   }
 }
 

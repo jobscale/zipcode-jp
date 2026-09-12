@@ -11,7 +11,7 @@ RUN apt-get update \
 ARG FUNCTION_DIR
 WORKDIR ${FUNCTION_DIR}
 
-COPY package.json package.json
+COPY --chmod=go+rX package.json package.json
 RUN npm config set fetch-timeout 300000 && npm i aws-lambda-ric \
  && npm i --omit=dev
 
@@ -35,11 +35,11 @@ RUN curl -sL -O https://www.post.japanpost.jp/service/search/zipcode/download/ut
 RUN sqlite3 db/database.sqlite "SELECT * FROM ken WHERE postal_code7 like '534002%' limit 2 offset 2"
 
 COPY --from=build-image ${FUNCTION_DIR} .
-COPY index.js .
-COPY lambda.js .
-COPY app app
-COPY docs docs
-COPY config config
+COPY --chmod=go+rX index.js .
+COPY --chmod=go+rX lambda.js .
+COPY --chmod=go+rX app app
+COPY --chmod=go+rX docs docs
+COPY --chmod=go+rX config config
 
 ENV NPM_CONFIG_CACHE=/tmp/.npm
 ENTRYPOINT ["npx", "aws-lambda-ric"]

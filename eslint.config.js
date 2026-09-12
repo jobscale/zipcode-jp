@@ -11,6 +11,8 @@ export default [{
   files: ['**/*.js'],
   rules: {
     ...standard.rules,
+    'no-new': 'off',
+    'no-template-curly-in-string': 'off',
   },
 }, {
   ...standard.configs.browser,

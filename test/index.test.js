@@ -3,7 +3,7 @@ import AdmZip from 'adm-zip';
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 import iconv from 'iconv-lite';
-import { logger } from '@jobscale/logger';
+import { logger } from '@jobscale/create-logger';
 import { describe, jest } from '@jest/globals';
 import request from 'supertest';
 import { app } from '../app/index.js';
