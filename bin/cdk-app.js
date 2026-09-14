@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import * as cdk from 'aws-cdk-lib/core';
 import { logger } from '@jobscale/create-logger';
 import { AppStack } from '../lib/app-stack.js';

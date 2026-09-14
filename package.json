@@ -14,6 +14,7 @@
   "scripts": {
     "start": "node index.js",
     "lint": "eslint",
+    "prelint": "npm config set script-shell bash",
     "pretest": "date -Iseconds",
     "posttest": "npm run lint",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --runInBand --coverage --collectCoverage",
@@ -21,8 +22,8 @@
     "validate": "ENV=${ENV:-dev} && cdk --context env=$ENV validate --build --unstable=validate",
     "synth": "ENV=${ENV:-dev} && cdk --context env=$ENV synth",
     "diff": "ENV=${ENV:-dev} && cdk --context env=$ENV diff",
-    "deploy": "ENV=${ENV:-dev} && time (ENV=$ENV node bin/push-ecr.js && cdk --app 'node bin/cdk-app.js' --context env=${ENV:-dev} deploy)",
-    "deploy:force": "ENV=${ENV:-dev} && time (ENV=$ENV node bin/push-ecr.js && cdk --app 'node bin/cdk-app.js' --context env=${ENV:-dev} deploy --require-approval never)",
+    "deploy": "ENV=${ENV:-dev} && time (ENV=$ENV bin/push-ecr.js && cdk --app 'bin/cdk-app.js' --context env=${ENV:-dev} deploy)",
+    "deploy:force": "ENV=${ENV:-dev} && time (ENV=$ENV bin/push-ecr.js && cdk --app 'bin/cdk-app.js' --context env=${ENV:-dev} deploy --require-approval never)",
     "ls": "ENV=${ENV:-dev} && cdk --context env=$ENV ls",
     "cdk": "ENV=${ENV:-dev} && cdk --context env=$ENV"
   },
