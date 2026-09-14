@@ -1,7 +1,10 @@
-FROM public.ecr.aws/lambda/nodejs:18
+FROM public.ecr.aws/lambda/nodejs:24
 SHELL ["bash", "-c"]
 
-RUN yum install -y git curl unzip sqlite3 locales
+RUN dnf install -y git curl-minimal unzip sqlite glibc-locale-source glibc-langpack-ja \
+ && dnf clean all && rm -rf /var/cache/dnf \
+ && localedef -i ja_JP -f UTF-8 ja_JP.UTF-8
+ENV LANG=ja_JP.UTF-8
 
 COPY package.json package.json
 RUN npm i --omit=dev

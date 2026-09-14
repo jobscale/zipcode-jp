@@ -25,11 +25,11 @@ logger.info('Using version', version);
 
 const repositories = [{
   repositoryName: 'zipcode-jp',
-  baseTag: 'lambda-debian',
+  baseTag: 'lambda',
   tagName: `lambda-debian-${version}`,
 }, {
   repositoryName: 'news-top',
-  baseTag: 'lambda-debian',
+  baseTag: 'lambda',
   tagName: `lambda-debian-${version}`,
 }];
 
