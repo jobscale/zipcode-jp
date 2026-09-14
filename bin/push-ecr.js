@@ -26,11 +26,11 @@ logger.info('Using version', version);
 const repositories = [{
   repositoryName: 'zipcode-jp',
   baseTag: 'lambda',
-  tagName: `lambda-debian-${version}`,
+  tagName: `lambda-${version}`,
 }, {
   repositoryName: 'news-top',
   baseTag: 'lambda',
-  tagName: `lambda-debian-${version}`,
+  tagName: `lambda-${version}`,
 }];
 
 const accountId = execFileSync(
@@ -76,4 +76,7 @@ repositories.forEach(({ repositoryName, baseTag, tagName }) => {
   ], { stdio: 'inherit' });
 });
 
-logger.info('All images have been pushed successfully.');
+logger.info({
+  'All repositories': repositories.map(item => item.repositoryName).join(', '),
+  'All images': 'have been pushed successfully.',
+});
