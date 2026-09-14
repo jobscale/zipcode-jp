@@ -1,25 +1,46 @@
-FROM public.ecr.aws/lambda/nodejs:24
+ARG FUNCTION_DIR="/var/task"
+
+FROM node:lts-trixie AS build-image
 SHELL ["bash", "-c"]
 
-RUN dnf install -y git curl-minimal unzip sqlite glibc-locale-source glibc-langpack-ja \
- && dnf clean all && rm -rf /var/cache/dnf \
- && localedef -i ja_JP -f UTF-8 ja_JP.UTF-8
-ENV LANG=ja_JP.UTF-8
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+    ca-certificates g++ make cmake unzip libcurl4-openssl-dev
 
-COPY package.json package.json
-RUN npm i --omit=dev
+ARG FUNCTION_DIR
+WORKDIR ${FUNCTION_DIR}
 
-COPY create.sql .
+COPY --chmod=go+rX package.json package.json
+RUN npm config set fetch-timeout 300000 && npm i aws-lambda-ric \
+ && npm i --omit=dev
+
+FROM node:lts-trixie-slim
+SHELL ["bash", "-c"]
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    ca-certificates git curl unzip sqlite3 locales
+RUN apt-get clean && rm -fr /var/lib/apt/lists/*
+
+ARG FUNCTION_DIR
+WORKDIR ${FUNCTION_DIR}
+
+COPY --chown=node:staff create.sql .
 RUN mkdir db && sqlite3 db/database.sqlite < create.sql
 RUN curl -sL -O https://www.post.japanpost.jp/service/search/zipcode/download/utf/zip/utf_ken_all.zip \
  && zcat utf_ken_all.zip | sqlite3 -separator , db/database.sqlite ".import /dev/stdin ken" \
  && rm utf_ken_all.zip
 RUN sqlite3 db/database.sqlite "SELECT * FROM ken WHERE postal_code7 like '534002%' limit 2 offset 2"
 
-COPY index.js .
-COPY lambda.js .
-COPY app app
-COPY docs docs
-COPY config config
+COPY --from=build-image ${FUNCTION_DIR} .
+COPY --chmod=go+rX index.js .
+COPY --chmod=go+rX lambda.js .
+COPY --chmod=go+rX app app
+COPY --chmod=go+rX docs docs
+COPY --chmod=go+rX config config
 
+ENV NPM_CONFIG_CACHE=/tmp/.npm
+ENTRYPOINT ["npx", "aws-lambda-ric"]
 CMD ["lambda.handler"]
