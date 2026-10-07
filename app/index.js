@@ -5,6 +5,7 @@ import fs from 'fs';
 import crypto from 'crypto';
 import mime from 'mime';
 import { logger } from '@jobscale/create-logger';
+import { formatTimestamp } from '@jobscale/timestamp';
 import createHttpError from 'http-errors';
 import { parseCookies } from './parse-cookie.js';
 import { route } from './route.js';
@@ -14,20 +15,6 @@ const { ENV } = process.env;
 
 const allowMethods = ['GET', 'HEAD', 'POST'];
 const allowHeaders = ['Content-Type'];
-
-const formatTimestamp = (ts = Date.now(), withoutTimezone = false) => {
-  const timestamp = new Intl.DateTimeFormat('sv-SE', {
-    timeZone: 'Asia/Tokyo',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  }).format(new Date(ts));
-  if (withoutTimezone) return timestamp;
-  return `${timestamp}+09:00`;
-};
 
 export class Ingress {
   constructor(opts = {}) {

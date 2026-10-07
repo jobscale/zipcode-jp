@@ -31,6 +31,10 @@ const repositories = [{
   repositoryName: 'news-top',
   baseTag: 'lambda',
   tagName: `lambda-${version}`,
+}, {
+  repositoryName: 'kabuka',
+  baseTag: 'lambda',
+  tagName: `lambda-${version}`,
 }];
 
 const accountId = execFileSync(
