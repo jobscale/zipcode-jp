@@ -6,7 +6,7 @@ export class Service {
   async hostname() {
     return {
       hostname: os.hostname(),
-      ip: await fetch('https://inet-ip.info/ip').then(res => res.text()).catch(e => e.message),
+      ip: await fetch('https://inet-ip.info/ip').then(res => res.text()).catch(e => e.cause?.message ?? e.message),
     };
   }
 

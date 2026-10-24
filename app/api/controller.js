@@ -6,9 +6,9 @@ export class Controller {
     return service.hostname()
     .then(result => res.json(result))
     .catch(e => {
-      logger.info({ message: e.message });
+      logger.info({ message: e.cause?.message ?? e.message });
       if (!e.status) e.status = 500;
-      res.status(e.status).json({ message: e.message });
+      res.status(e.status).json({ message: e.cause?.message ?? e.message });
     });
   }
 
@@ -17,9 +17,9 @@ export class Controller {
     return service.find({ code })
     .then(result => res.json(result))
     .catch(e => {
-      logger.info({ message: e.message });
+      logger.info({ message: e.cause?.message ?? e.message });
       if (!e.status) e.status = 500;
-      res.status(e.status).json({ message: e.message });
+      res.status(e.status).json({ message: e.cause?.message ?? e.message });
     });
   }
 }
